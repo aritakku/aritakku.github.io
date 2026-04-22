@@ -255,6 +255,7 @@
 			studyId: "test-1",
 			participantId: "P1",
 
+			afterSubmitForwardToNextWindowLocation: false,
 			nextWindowLocationHref: "test-2.html",
 			
             nudgeType: GRAY_BOTTOM, 
@@ -454,7 +455,10 @@
 			// --- NEW REDIRECT LOGIC ---
 			// alert("Results saved and exported. Moving to the next task...");
 			
-			window.location.href = CONFIG.nextWindowLocationHref;	});
+			if (CONFIG.afterSubmitForwardToNextWindowLocation && CONFIG.nextWindowLocationHref) {
+    			window.location.href = CONFIG.nextWindowLocationHref;
+			}
+		});
     </script>
 
 </body>
