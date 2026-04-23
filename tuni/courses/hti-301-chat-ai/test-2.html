@@ -4,213 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Usability Test</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-main: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --accent-red: #d70015;
-            --border-gray: #e5e5e5;
-            --input-bg: #f4f4f4;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #task-header {
-            text-align: center;
-            max-width: 600px;
-            margin-bottom: 30px;
-        }
-        #task-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; }
-        #task-desc { color: var(--text-secondary); font-size: 1rem; line-height: 1.3; }
-
-        #chat-container {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-			margin-top: 20px;
-			/* Add horizontal padding so the icon doesn't hit the screen edge */
-			padding: 0 50px; 
-			box-sizing: border-box;
-		}
-
-        #prompt-heading {
-            font-size: 1.6rem;
-            font-weight: 600;
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        #input-area {
-            margin-bottom: 20px;
-        }
-
-        #response-area {
-            display: none;
-            margin-bottom: 0px;
-            font-size: 1rem;
-            line-height: 1.5; /* Good line height for readability */
-        }
-
-        .response-line {
-            margin-bottom: 8px; /* Tight paragraph spacing */
-            display: block; 
-            /* white-space: pre-wrap; is NOT used here, as it conflicts with precise inline icon insertion. 
-               The typing logic now handles line breaks if manually specified in CONFIG with \n */
-			clear: both; /* Prevents icons from previous paragraphs stacking */
-		}
-
-        .line-text {
-            display: inline;
-        }
-
-        /* The NEW approach: Inline icon wrapper that stays anchored precisely where it is inserted */
-        .inline-icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            vertical-align: text-bottom; /* Anchors the bottom of the icon to the text flow */
-            margin: 0 4px 0 6px; /* Spacing from surrounding text */
-            position: relative;
-            line-height: 1; /* Stops icon from altering paragraph line-height */
-        }
-
-		.inline-alert-float {
-			float: right;
-			/* This pushes the icon into the margin area */
-			margin-right: -40px; 
-			margin-left: 10px;
-			display: flex;
-			align-items: center;
-			height: 1.5rem;
-			/* Ensure the icon doesn't disappear if the screen is too narrow */
-			position: relative; 
-			z-index: 10;
-		}
-
-
-        .input-wrapper {
-            background: var(--input-bg);
-            border-radius: 20px;
-            padding: 4px 12px;
-            display: flex;
-            align-items: center;
-        }
-
-        #user-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 1rem;
-            padding: 10px;
-        }
-
-        #send-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #bottom-nudge {
-            margin: 0 0 20px 0;
-            font-size: 0.8rem;
-            text-align: center;
-            width: 100%;
-            display: none;
-        }
-
-        #feedback-section {
-            display: none;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-gray);
-            width: 100%;
-        }
-        #feedback-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.95rem; }
-        #feedback-text {
-            width: 100%;
-            height: 100px;
-            border-radius: 8px;
-            border: 1px solid var(--border-gray);
-            padding: 12px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-
-		/* Small copyright text at the very bottom */
-		#copyright-notice {
-			display: none;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-			font-size: 0.75rem;
-			line-height: 1.7;
-			color: #2c2c2e;
-			max-width: 650px;
-			margin: 0 0 20px 0;
-			padding: 0;
-		}
-		.alert-warn {
-			color: var(--accent-red);
-			font-weight: 600;
-			/* You can also add background-color: #fff0f0; for more visibility */
-		}
-		
-		.likert-row {
-			margin-bottom: 20px;
-			padding: 10px 0;
-			border-bottom: 1px solid var(--border-gray);
-		}
-		.likert-question { margin-bottom: 10px; font-weight: 500; font-size: 0.95rem; }
-		.likert-options {
-			display: flex;
-			justify-content: space-between;
-			text-align: center;
-		}
-		.likert-option {
-			display: flex;
-			flex-direction: column;
-			font-size: 0.75rem;
-			color: var(--text-secondary);
-			width: 60px;
-		}
-		.likert-option input { margin-bottom: 5px; cursor: pointer; }
-
-		#save-continue-btn {
-			display: none; /* Shown after feedback is filled */
-			width: 100%;
-			padding: 15px;
-			background: #0071e3;
-			color: white;
-			border: none;
-			border-radius: 12px;
-			font-size: 1rem;
-			font-weight: 600;
-			cursor: pointer;
-			margin: 40px 0;
-		}
-		#save-continue-btn:hover { background: #0077ed; }
-    </style>
 </head>
 <body>
 
@@ -228,28 +23,26 @@
             </div>
         </div>
         <div id="response-area"></div>
-		<div id="copyright-notice"></div>
-		<div id="bottom-nudge"></div>
-
-		
+        <div id="copyright-notice"></div>
+        <div id="bottom-nudge"></div>
+        
         <div id="feedback-section">
             <label id="feedback-label"></label>
             <textarea id="feedback-text"></textarea>
-			<div id="likert-container"></div>
-
-			<button id="save-continue-btn">Save answers and continue to the next task</button>
-			<a id="export-link" style="display:none;"></a>
+            <div id="likert-container"></div>
+            <button id="save-continue-btn">Save answers and continue to the next task</button>
         </div>
     </div>
 
+    <div id="thank-you">
+        <div class="success-icon"><i data-lucide="check-circle-2"></i></div>
+        <h2 id="thanks-title">Thank you!</h2>
+        <p id="thanks-message"></p>
+    </div>
 
     <script>
-		const GRAY_BOTTOM = 1;
-		const RED_BOTTOM = 2;
-		const GREY_ICON = 3;
-		const RED_ICON = 4;
-		const NUDGE_BOTTOM_IMMEDIATE = 5;
-		const NUDGE_BOTTOM_AFTER_RESULT = 6;
+		const GRAY_BOTTOM = 1, RED_BOTTOM = 2, GREY_ICON = 3, RED_ICON = 4;
+		const NUDGE_BOTTOM_IMMEDIATE = 5, NUDGE_BOTTOM_AFTER_RESULT = 6;
 
         const CONFIG = {
 			studyId: "test-2",
@@ -289,7 +82,7 @@
 
 "Vietnam, officially the Socialist Republic of Viet Nam (SRV), is a country at the eastern edge of Mainland Southeast Asia. With an area of about 331,000 square kilometres and a population of over 102 million, it is the world's 16th-most populous country. One of two communist states in Southeast Asia, [ALERT] Vietnam is bordered by China to the north, and Laos and Cambodia to the west; it lies along the Gulf of Thailand to the southwest and the South China Sea to the east, where it has shared and disputed maritime borders with other countries. Its capital is Hanoi, while its largest city is Ho Chi Minh City.",
 
-"Vietnam was inhabited by the Paleolithic age, with states established in the first millennium BC on the Red River Delta in modern-day northern Vietnam. The Han dynasty annexed northern and central Vietnam, which were subsequently under Chinese rule from 111 BC until the first dynasty emerged in 939. Successive monarchical dynasties absorbed Chinese influences through Confucianism and Buddhism, and expanded southward to the Mekong Delta, conquering Champa. During most of the 17th and 18th centuries, Vietnam was effectively divided into two domains of ÃÃ ng Trong and ÃÃ ng NgoÃ i. The Nguy--nâ€”the last imperial dynastyâ€”surrendered to France in 1883. In 1887, its territory was integrated into French Indochina as three separate regions. In the immediate aftermath of World War II, the Viet Minh, a coalition front led by the communist revolutionary Ho Chi Minh, launched the August Revolution and declared Vietnam's independence from the Empire of Japan in 1945.",
+"Vietnam was inhabited by the Paleolithic age, with states established in the first millennium BC on the Red River Delta in modern-day northern Vietnam. The Han dynasty annexed northern and central Vietnam, which were subsequently under Chinese rule from 111 BC until the first dynasty emerged in 939. Successive monarchical dynasties absorbed Chinese influences through Confucianism and Buddhism, and expanded southward to the Mekong Delta, conquering Champa. During most of the 17th and 18th centuries, Vietnam was effectively divided into two domains of Ðàng Trong and Ðàng Ngoài. The Nguy--n—the last imperial dynasty—surrendered to France in 1883. In 1887, its territory was integrated into French Indochina as three separate regions. In the immediate aftermath of World War II, the Viet Minh, a coalition front led by the communist revolutionary Ho Chi Minh, launched the August Revolution and declared Vietnam's independence from the Empire of Japan in 1945.",
 
 "Vietnam went through prolonged warfare in the 20th century. After World War II, France returned to reclaim colonial power in the First Indochina War, from which Vietnam emerged victorious in 1954. As a result of the treaties signed between the Viet Minh and France, Vietnam was also separated into two parts. The Vietnam War began shortly after, between the communist North Vietnam, supported by the Soviet Union and China, and the anti-communist South Vietnam, supported by the United States. Upon the North Vietnamese victory in 1975, Vietnam reunified as a unitary communist state that self-designated as a socialist state under the Communist Party of Vietnam (CPV) in 1976. An ineffective planned economy, a trade embargo by the West, and wars with Cambodia and China crippled the country further. In 1986, the CPV launched economic and political reforms similar to the Chinese economic reform, transforming the country to a socialist-oriented market economy. The reforms facilitated Vietnamese reintegration into the global economy and politics.",
 
@@ -299,175 +92,8 @@
             ],
                                     
             alertIconName: "alert-circle", // e.g., "alert-circle", "help-circle", "shield-alert"
-        };
-
-        // UI Setup
-        document.getElementById('task-title').innerText = CONFIG.taskTitle;
-        document.getElementById('task-desc').innerText = CONFIG.taskDescription;
-        document.getElementById('prompt-heading').innerText = CONFIG.promptHeadingText;
-        document.getElementById('feedback-label').innerText = CONFIG.feedbackQuestion;
-        lucide.createIcons();
-
-        // Helper to delay execution
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-        // Helper to type text into a specific element
-        async function typeIntoSpan(spanElement, text) {
-            for (let char of text) {
-                spanElement.textContent += char;
-                await sleep(CONFIG.typingSpeed);
-            }
-        }
-
-		async function runUsabilityTest() {
-			// --- INTERNAL HELPERS ---
-			
-			// Helper to create spans for typewriter effect
-			function createSpan(parent, className = "line-text") {
-				const span = document.createElement('span');
-				span.className = className;
-				parent.appendChild(span);
-				return span;
-			}
-
-			// Helper to inject the floating icon into the margin
-			function injectIcon(parent) {
-				const iconWrap = document.createElement('div');
-				iconWrap.className = 'inline-alert-float';
-				iconWrap.style.color = (CONFIG.nudgeType === RED_ICON) ? 'var(--accent-red)' : 'var(--text-secondary)';
-				iconWrap.innerHTML = `<i data-lucide="${CONFIG.alertIconName}" size="22"></i>`;
-				parent.appendChild(iconWrap);
-				lucide.createIcons();
-			}
-
-			// Helper to render Likert scales dynamically from CONFIG
-			function renderLikert() {
-				const container = document.getElementById('likert-container');
-				CONFIG.likertQuestions.forEach(q => {
-					const row = document.createElement('div');
-					row.className = 'likert-row';
-					row.innerHTML = `<div class="likert-question">${q.text}</div><div class="likert-options"></div>`;
-					const optionsContainer = row.querySelector('.likert-options');
-					
-					CONFIG.likertLabels.forEach((label, index) => {
-						const opt = document.createElement('label');
-						opt.className = 'likert-option';
-						opt.innerHTML = `<input type="radio" name="${q.id}" value="${index + 1}"><span>${label}</span>`;
-						optionsContainer.appendChild(opt);
-					});
-					container.appendChild(row);
-				});
-				document.getElementById('save-continue-btn').style.display = 'block';
-			}
-
-			// --- MAIN EXECUTION FLOW ---
-			
-			const input = document.getElementById('user-input');
-			if (!input.value.trim()) return;
-
-			// Save prompt to local storage
-			localStorage.setItem('user_query', input.value);
-
-			// UI Transitions
-			document.getElementById('prompt-heading').style.display = 'none';
-			document.getElementById('response-area').style.display = 'block';
-			input.disabled = true;
-			document.getElementById('send-btn').style.visibility = 'hidden';
-
-			const area = document.getElementById('response-area');
-
-			// Typewriter loop with Alert parsing
-			for (let line of CONFIG.aiResponse) {
-				const lineDiv = document.createElement('div');
-				lineDiv.className = 'response-line';
-				area.appendChild(lineDiv);
-
-				const cleanLine = line.replace(/--/g, '\u2014').replace(/[\uFFFD]/g, "--");
-
-				const highlightRegex = /\[ALERT\](.*?)\[\/ALERT\]/;
-				const highlightMatch = cleanLine.match(highlightRegex);
-
-				if (highlightMatch) {
-					const parts = cleanLine.split(highlightRegex);
-					await typeIntoSpan(createSpan(lineDiv), parts[0]);
-					if (CONFIG.nudgeType === GREY_ICON || CONFIG.nudgeType === RED_ICON) injectIcon(lineDiv);
-					await typeIntoSpan(createSpan(lineDiv, "alert-warn"), parts[1]);
-					if (parts[2]) await typeIntoSpan(createSpan(lineDiv), parts[2]);
-				} 
-				else if (cleanLine.includes("[ALERT]")) {
-					const parts = cleanLine.split("[ALERT]");
-					await typeIntoSpan(createSpan(lineDiv), parts[0]);
-					if (CONFIG.nudgeType === GREY_ICON || CONFIG.nudgeType === RED_ICON) injectIcon(lineDiv);
-					if (parts[1]) await typeIntoSpan(createSpan(lineDiv), parts[1]);
-				} 
-				else {
-					await typeIntoSpan(createSpan(lineDiv), cleanLine);
-				}
-			}
-
-			// Final Reveals
-			renderLikert();
-			document.getElementById('feedback-section').style.display = 'block';
-			document.getElementById('copyright-notice').innerHTML='Source: ' + CONFIG.copyrightText + ' Used for usability research purposes only.';
-			document.getElementById('copyright-notice').style.display = 'block';
-		
-		
-			// --- NUDGE LOGIC ---
-			const nudge = document.getElementById('bottom-nudge');
-			if (CONFIG.nudgeType === GRAY_BOTTOM || CONFIG.nudgeType === RED_BOTTOM) {
-				nudge.innerText = CONFIG.nudgeText;
-				nudge.style.display = 'block';
-				nudge.style.color = (CONFIG.nudgeType === RED_BOTTOM) ? 'var(--accent-red)' : 'var(--text-secondary)';
-			}
-		
-		} // END OF async function runUsabilityTest()
-
-        // Event Listeners
-        document.getElementById('send-btn').addEventListener('click', runUsabilityTest);
-        document.getElementById('user-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') runUsabilityTest();
-        });
-        document.getElementById('feedback-text').addEventListener('input', (e) => {
-            localStorage.setItem('user_feedback', e.target.value);
-        });
-		document.getElementById('save-continue-btn').addEventListener('click', () => {
-
-			if (!confirm("Do you really want to save answers and continue to the next task?")) return;
-
-			const participantId = CONFIG.participantId || "anon";
-			const resultId = `hti-301-at-${CONFIG.studyId}_${participantId}_${Date.now()}`;
-
-			const results = {
-				meta: { studyId: CONFIG.studyId, participant: participantId, date: new Date().toLocaleString() },
-				input: localStorage.getItem('user_query'),
-				answer: document.getElementById('feedback-text').value,
-				likert: {}
-			};
-
-			CONFIG.likertQuestions.forEach(q => {
-				const val = document.querySelector(`input[name="${q.id}"]:checked`);
-				results.likert[q.id] = val ? val.value : "none";
-			});
-
-			// Save to LocalStorage
-			localStorage.setItem(resultId, JSON.stringify(results));
-
-			// Instant Export for USB: Trigger a JSON download
-			const blob = new Blob([JSON.stringify(results, null, 2)], { type: "application/json" });
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = `${resultId}.json`;
-			a.click();
-
-			// --- NEW REDIRECT LOGIC ---
-			// alert("Results saved and exported. Moving to the next task...");
-			
-			if (CONFIG.afterSubmitForwardToNextWindowLocation && CONFIG.nextWindowLocationHref) {
-    			window.location.href = CONFIG.nextWindowLocationHref;
-			}
-		});
-    </script>
-
+        };    
+	</script>
+    <script src="script.js"></script>
 </body>
 </html>
