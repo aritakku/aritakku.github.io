@@ -110,13 +110,83 @@ async function runUsabilityTest() {
         nudge.style.color = (CONFIG.nudgeType === RED_BOTTOM) ? 'var(--accent-red)' : 'var(--text-secondary)';
     }
 }
+function saveToServer() {
+    const results = {
+        meta: { 
+            studyId: CONFIG.studyId, 
+            participant: CONFIG.participantId, 
+            date: new Date().toLocaleString() 
+        },
+        input: localStorage.getItem('user_query'),
+        answer: document.getElementById('feedback-text').value,
+        likert: {}
+    };
 
+    CONFIG.likertQuestions.forEach(q => {
+        const val = document.querySelector(`input[name="${q.id}"]:checked`);
+        results.likert[q.id] = val ? val.value : "none";
+    });
+
+    // Send data to your PHP API
+    fetch('save_results.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(results)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        // Once saved, you can trigger the "Thank You" screen
+        document.getElementById('chat-container').style.display = 'none';
+        document.getElementById('thank-you').style.display = 'block';
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert("Error saving data. Please notify the researcher.");
+    });
+}
+/**
+ * Sends survey data to the PHP API
+ * Tobii browser session data is cleared after recording, so we send it immediately.
+ */
+function saveDataToExternalServer(results) {
+    fetch('https://takku.fi/hti-301-chat-ai-api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(results)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('API request failed');
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch(error => {
+        // Log the error for the researcher, but don't stop the UI transition
+        console.error('Data saving error:', error);
+    })
+    .finally(() => {
+        // This block runs REGARDLESS of success or failure
+        if (CONFIG.afterSubmitForwardToNextWindowLocation && CONFIG.nextWindowLocationHref) {
+            window.location.href = CONFIG.nextWindowLocationHref;
+        } else {
+            showCompletionMessage();
+        }
+    });
+}
 window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('task-title').innerText = CONFIG.taskTitle;
     document.getElementById('task-desc').innerText = CONFIG.taskDescription;
     document.getElementById('prompt-heading').innerText = CONFIG.promptHeadingText;
     document.getElementById('feedback-label').innerText = CONFIG.feedbackQuestion;
-    lucide.createIcons();
+    
+    // Safety check for Lucide icons within the Tobii browser environment
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
     document.getElementById('send-btn').addEventListener('click', runUsabilityTest);
     document.getElementById('user-input').addEventListener('keypress', (e) => {
@@ -128,7 +198,11 @@ window.addEventListener('DOMContentLoaded', () => {
         // if (!confirm("Do you really want to save answers and continue to the next task?")) return; 
         
         const results = {
-            meta: { studyId: CONFIG.studyId, participant: CONFIG.participantId, date: new Date().toLocaleString() },
+            meta: { 
+                studyId: CONFIG.studyId, 
+                participant: CONFIG.participantId, 
+                date: new Date().toLocaleString() 
+            },
             input: localStorage.getItem('user_query'),
             answer: document.getElementById('feedback-text').value,
             likert: {}
@@ -139,12 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
             results.likert[q.id] = val ? val.value : "none";
         });
 
-        const blob = new Blob([JSON.stringify(results, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `hti-301-at-${CONFIG.studyId}_${CONFIG.participantId}_${Date.now()}.json`;
-        a.click();
+        saveDataToExternalServer(results);
 
         if (CONFIG.afterSubmitForwardToNextWindowLocation && CONFIG.nextWindowLocationHref) {
             window.location.href = CONFIG.nextWindowLocationHref;
