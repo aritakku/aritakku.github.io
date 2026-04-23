@@ -29,7 +29,7 @@ function showCompletionMessage() {
     document.getElementById('task-header').style.display = 'none';
     document.getElementById('chat-container').style.display = 'none';
     const thanksDiv = document.getElementById('thank-you');
-    document.getElementById('thanks-message').innerText = "Thank you for your participation. Your responses have been saved and exported. Please inform the researcher to proceed.";
+    document.getElementById('thanks-message').innerText = "Thank you! Task was completed successfully. You will be redirected to next task shortly.";
     thanksDiv.style.display = 'flex';
     lucide.createIcons();
 }
