@@ -90,21 +90,20 @@
     </script>
 	<script>
 		(function() {
-		    const timestamp = new Date().getTime();
-		
-		    // Dynamically add Stylesheet to head
-		    const link = document.createElement('link');
-		    link.rel = 'stylesheet';
-		    link.href = 'style.css?v=' + timestamp;
-		    document.head.appendChild(link);
-		
-		    // Force script.js to load AFTER the body (and CONFIG) is ready
-		    window.addEventListener('load', function() {
-		        const script = document.createElement('script');
-		        script.src = 'script.js?v=' + timestamp;
-		        document.body.appendChild(script);
-		    });
-		})();	
+            const script = document.createElement('script');
+            script.src = "script.js?v=" + new Date().getTime();
+            
+            // This is the critical change: 
+            // It ensures the script only runs AFTER it has fully loaded
+            script.onload = function() {
+                console.log("script.js loaded successfully.");
+                if (window.initUI) {
+                    window.initUI(); // Trigger your rendering function
+                }
+            };
+
+            document.body.appendChild(script);
+        })();
 	</script>
 
 </body>
