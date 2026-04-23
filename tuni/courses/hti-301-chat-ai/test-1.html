@@ -8,24 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Usability Test</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-	<script>
-		(function() {
-		    const timestamp = new Date().getTime();
-		
-		    // Dynamically add Stylesheet to head
-		    const link = document.createElement('link');
-		    link.rel = 'stylesheet';
-		    link.href = 'style.css?v=' + timestamp;
-		    document.head.appendChild(link);
-		
-		    // Force script.js to load AFTER the body (and CONFIG) is ready
-		    window.addEventListener('load', function() {
-		        const script = document.createElement('script');
-		        script.src = 'script.js?v=' + timestamp;
-		        document.body.appendChild(script);
-		    });
-		})();	
-	</script>
 </head>
 <body>
 
@@ -106,5 +88,24 @@
             alertIconName: "alert-circle", // e.g., "alert-circle", "help-circle", "shield-alert"
         };
     </script>
+	<script>
+		(function() {
+		    const timestamp = new Date().getTime();
+		
+		    // Dynamically add Stylesheet to head
+		    const link = document.createElement('link');
+		    link.rel = 'stylesheet';
+		    link.href = 'style.css?v=' + timestamp;
+		    document.head.appendChild(link);
+		
+		    // Force script.js to load AFTER the body (and CONFIG) is ready
+		    window.addEventListener('load', function() {
+		        const script = document.createElement('script');
+		        script.src = 'script.js?v=' + timestamp;
+		        document.body.appendChild(script);
+		    });
+		})();	
+	</script>
+
 </body>
 </html>
