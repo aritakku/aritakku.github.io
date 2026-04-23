@@ -310,7 +310,16 @@
                 await sleep(CONFIG.typingSpeed);
             }
         }
-
+		function showCompletionMessage() {
+    		// Hide the chat and feedback to show a clean finish screen
+    		document.getElementById('chat-container').style.display = 'none';
+    		document.getElementById('task-header').innerHTML = `
+        		<div id="task-title">Task Completed</div>
+        		<div id="task-desc">Thank you for your participation. Please inform the researcher that you are finished.</div>
+        		<button onclick="window.location.reload()" style="margin-top:20px; padding:10px; cursor:pointer;">Restart Task</button>
+    		`;
+		}
+		
 		async function runUsabilityTest() {
 			// --- INTERNAL HELPERS ---
 			
@@ -452,12 +461,11 @@
 			a.download = `${resultId}.json`;
 			a.click();
 
-			// --- NEW REDIRECT LOGIC ---
-			// alert("Results saved and exported. Moving to the next task...");
-			
 			if (CONFIG.afterSubmitForwardToNextWindowLocation && CONFIG.nextWindowLocationHref) {
     			window.location.href = CONFIG.nextWindowLocationHref;
-			}
+			} else {
+        		showCompletionMessage();
+    		}
 		});
     </script>
 
