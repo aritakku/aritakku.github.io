@@ -1,21 +1,5 @@
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-// Inside your script.js file
-window.initUI = function() {
-    console.log("Initializing UI with CONFIG:", CONFIG);
-
-    // 1. Fill the headers and descriptions from your HTML CONFIG block
-    document.getElementById('task-title').innerText = CONFIG.taskTitle;
-    document.getElementById('task-desc').innerText = CONFIG.taskDescription;
-    document.getElementById('prompt-heading').innerText = CONFIG.promptHeadingText;
-
-    // 2. Initialize the icons (Lucide library)
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-
-};
-
 // Helper: Create spans for typewriter effect - Exact match to working code
 function createSpan(parent, className = "line-text") {
     const span = document.createElement('span');
