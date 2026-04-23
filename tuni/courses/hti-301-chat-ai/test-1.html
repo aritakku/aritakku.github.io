@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Usability Test</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+	<script>
+    (function() {
+        const timestamp = new Date().getTime();
+
+        // Dynamically add Stylesheet with timestamp
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'style.css?v=' + timestamp;
+        document.head.appendChild(link);
+
+        // Dynamically add script.js with timestamp
+        const script = document.createElement('script');
+        script.src = 'script.js?v=' + timestamp;
+        document.body.appendChild(script);
+    })();
+	</script>
 </head>
 <body>
 
@@ -86,6 +104,5 @@
             alertIconName: "alert-circle", // e.g., "alert-circle", "help-circle", "shield-alert"
         };
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
