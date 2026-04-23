@@ -9,20 +9,22 @@
     <title>AI Usability Test</title>
     <script src="https://unpkg.com/lucide@latest"></script>
 	<script>
-    (function() {
-        const timestamp = new Date().getTime();
-
-        // Dynamically add Stylesheet with timestamp
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'style.css?v=' + timestamp;
-        document.head.appendChild(link);
-
-        // Dynamically add script.js with timestamp
-        const script = document.createElement('script');
-        script.src = 'script.js?v=' + timestamp;
-        document.body.appendChild(script);
-    })();
+		(function() {
+		    const timestamp = new Date().getTime();
+		
+		    // Dynamically add Stylesheet to head
+		    const link = document.createElement('link');
+		    link.rel = 'stylesheet';
+		    link.href = 'style.css?v=' + timestamp;
+		    document.head.appendChild(link);
+		
+		    // Force script.js to load AFTER the body (and CONFIG) is ready
+		    window.addEventListener('load', function() {
+		        const script = document.createElement('script');
+		        script.src = 'script.js?v=' + timestamp;
+		        document.body.appendChild(script);
+		    });
+		})();	
 	</script>
 </head>
 <body>
