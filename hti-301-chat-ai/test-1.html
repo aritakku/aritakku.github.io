@@ -223,14 +223,22 @@
 		    background: var(--bg-color);
 		    border: 1px solid var(--border-gray);
 		    border-radius: 24px;
-		    animation: fadeIn 0.6s ease-out;
+		    /* Slowed down to 1.5s with a smoother timing function */
+		    animation: slowFadeIn 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 		}
 		
-		@keyframes fadeIn {
-		    from { opacity: 0; transform: translateY(10px); }
-		    to { opacity: 1; transform: translateY(0); }
-		}
-		
+		@keyframes slowFadeIn {
+		    from { 
+		        opacity: 0; 
+		        transform: translateY(20px);
+		        filter: blur(5px); /* Softens the initial appearance */
+		    }
+		    to { 
+		        opacity: 1; 
+		        transform: translateY(0);
+		        filter: blur(0);
+		    }
+		}		
 		.success-icon {
 		    color: #28a745; /* Professional green */
 		    margin-bottom: 20px;
@@ -363,20 +371,25 @@
                 await sleep(CONFIG.typingSpeed);
             }
         }
-		function showCompletionMessage() {
- 		   // 1. Hide the active UI
-    		document.getElementById('task-header').style.display = 'none';
-    		document.getElementById('chat-container').style.display = 'none';
 
-		    // 2. Setup the Thank You content
-    		const thanksDiv = document.getElementById('thank-you');
-    		const message = document.getElementById('thanks-message');
-    
-		    // message.innerText = "Thank you for your participation. Please inform the researcher that you have finished this task.";
-    
-		    // 3. Reveal the Thank You screen
-    		thanksDiv.style.display = 'block';
+		function showCompletionMessage() {
+		    // 1. Hide everything else
+		    document.getElementById('task-header').style.display = 'none';
+		    document.getElementById('chat-container').style.display = 'none';
+		
+		    // 2. Setup the content
+		    const thanksDiv = document.getElementById('thank-you');
+		    const message = document.getElementById('thanks-message');
+		    
+		    message.innerText = "Thank you for your participation. Your responses have been saved and exported. Please inform the researcher to proceed.";
+		    
+		    // 3. Show the div (this triggers the 1.5s CSS animation)
+		    thanksDiv.style.display = 'flex';
+		    
+		    // 4. Render the checkmark icon
+		    lucide.createIcons();
 		}
+		
 		async function runUsabilityTest() {
 			// --- INTERNAL HELPERS ---
 			
