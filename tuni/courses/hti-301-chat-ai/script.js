@@ -124,7 +124,8 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('save-continue-btn').addEventListener('click', () => {
-        if (!confirm("Do you really want to save answers and continue to the next task?")) return;
+        // Tobii-issue
+        // if (!confirm("Do you really want to save answers and continue to the next task?")) return; 
         
         const results = {
             meta: { studyId: CONFIG.studyId, participant: CONFIG.participantId, date: new Date().toLocaleString() },
