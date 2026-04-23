@@ -94,23 +94,7 @@
             alertIconName: "alert-circle", // e.g., "alert-circle", "help-circle", "shield-alert"
         };
     </script>
-	<script>
-		(function() {
-            const script = document.createElement('script');
-            script.src = "script.js?v=" + new Date().getTime();
-            
-            // This is the critical change: 
-            // It ensures the script only runs AFTER it has fully loaded
-            script.onload = function() {
-                console.log("script.js loaded successfully.");
-                if (window.initUI) {
-                    window.initUI(); // Trigger your rendering function
-                }
-            };
-
-            document.body.appendChild(script);
-        })();
-	</script>
+	<script src="script.js?v=20260423v9"></script>
 
 </body>
 </html>
