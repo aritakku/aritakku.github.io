@@ -210,6 +210,29 @@
 			margin: 40px 0;
 		}
 		#save-continue-btn:hover { background: #0077ed; }
+		#thank-you {
+    		text-align: center;
+    		max-width: 500px;
+    		margin-top: 100px;
+    		padding: 40px;
+    		background: var(--bg-color);
+    		border-radius: 20px;
+    		/* Optional: add a subtle shadow to make it pop */
+    		box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+		}
+
+		#thanks-title {
+    		font-size: 1.8rem;
+    		font-weight: 700;
+    		margin-bottom: 15px;
+		}
+
+		#thanks-message {
+    		color: var(--text-secondary);
+    		font-size: 1.1rem;
+    		line-height: 1.5;
+    		margin-bottom: 30px;
+		}		
     </style>
 </head>
 <body>
@@ -242,6 +265,10 @@
         </div>
     </div>
 
+	<div id="thank-you" style="display: none;">
+    	<h2 id="thanks-title">Thank you!</h2>
+    	<p id="thanks-message">Task completed successfully.<br>You will be redirected shortly.</p>
+	</div>
 
     <script>
 		const GRAY_BOTTOM = 1;
@@ -319,7 +346,20 @@
         		<button onclick="window.location.reload()" style="margin-top:20px; padding:10px; cursor:pointer;">Restart Task</button>
     		`;
 		}
-		
+		function showCompletionMessage() {
+ 		   // 1. Hide the active UI
+    		document.getElementById('task-header').style.display = 'none';
+    		document.getElementById('chat-container').style.display = 'none';
+
+		    // 2. Setup the Thank You content
+    		const thanksDiv = document.getElementById('thank-you');
+    		const message = document.getElementById('thanks-message');
+    
+		    // message.innerText = "Thank you for your participation. Please inform the researcher that you have finished this task.";
+    
+		    // 3. Reveal the Thank You screen
+    		thanksDiv.style.display = 'block';
+		}
 		async function runUsabilityTest() {
 			// --- INTERNAL HELPERS ---
 			
