@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Zotero Panel Reorder",
+  "version": "1.0.2",
+  "description": "Reorders right hand side panels",
+  "author": "Zotero",
+  "icons": {
+    "48": "up3.ico",
+    "96": "up3.ico"
+  },
+  "applications": {
+    "zotero": {
+      "id": "zotero-panel-reorder@aritakku",
+      "update_url": "https://aritakku.github.io/zotero/zotero-layout-modifier/updates.json",
+      "strict_min_version": "6.999",
+      "strict_max_version": "9.0.*"
+    }
+  }
+}
