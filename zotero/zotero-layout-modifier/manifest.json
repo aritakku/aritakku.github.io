@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Zotero Layout Modifier",
-  "version": "1.0.6",
+  "name": "Zotero Layout Lab",
+  "version": "1.0.7",
   "description": "Reorders right hand side panels, renames annotation colors, ...",
   "author": "Zotero",
   "icons": {
@@ -15,5 +15,17 @@
       "strict_min_version": "6.999",
       "strict_max_version": "9.0.*"
     }
+  },
+  "__custom" : {		
+   	"PRECISION-3680-": {
+      "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
+      "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-modifier\\",
+      "_comment" : ""
+  	}, 
+  	"PROBOOK...?" : {
+      "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
+      "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-modifier\\",
+      "_comment" : ""
+	  }
   }
 }

@@ -3,12 +3,24 @@
    ============================================================================== */
 const DEBUG = true;
 
-// Registry vectors to catch instances for clean garbage collection on shutdown
 const openLayoutObservers = new Map();
 const openColorObservers = new Map();
+const activeTabListeners = new Map();
 
 function log(msg) {
-  if (DEBUG) Zotero.debug(`[ACADEMIC-DECK] ${msg}`);
+  if (DEBUG) {
+    // This routes to Zotero's internal Help -> View Log
+    Zotero.debug(`[ACADEMIC-DECK] ${msg}`);
+
+    // This forces it into your open Browser Console window natively!
+    if (typeof console !== "undefined" && console.log) {
+      console.log(
+        `%c[ACADEMIC-DECK]%c ${msg}`,
+        "color: #ffd400; font-weight: bold;",
+        "color: default;",
+      );
+    }
+  }
 }
 
 const COLOR_PROTOCOL = {
@@ -29,7 +41,7 @@ const COLOR_PROTOCOL = {
 };
 
 /* ==============================================================================
-   COLOR PROTOCOL MANAGEMENT MODULE
+   COLOR PROTOCOL MANAGEMENT MODULE (ANTI-LOCALIZATION OVERRIDE)
    ============================================================================== */
 function injectTooltips(root) {
   if (!root || !root.querySelectorAll) return;
@@ -37,23 +49,42 @@ function injectTooltips(root) {
   const buttons = root.querySelectorAll("button.color-button");
   if (!buttons.length) return;
 
-  log(`[COLOR] Found ${buttons.length} color buttons`);
-
-  // Optimized high-efficiency loop cache
   for (let b = 0; b < buttons.length; b++) {
     const btn = buttons[b];
-    const key = btn.getAttribute("title");
-    const rule = COLOR_PROTOCOL[key];
+
+    // Read the primary string token right out of the fluent dataset metadata if available
+    const nativeTitle =
+      btn.getAttribute("title") || btn.getAttribute("data-l10n-id") || "";
+
+    // Normalize string identifiers (handles potential trailing localization keys)
+    let matchedKey = null;
+    if (COLOR_PROTOCOL[nativeTitle]) {
+      matchedKey = nativeTitle;
+    } else {
+      // Alternate fallback check for custom localization formats
+      for (let key in COLOR_PROTOCOL) {
+        if (nativeTitle.includes(key)) {
+          matchedKey = key;
+          break;
+        }
+      }
+    }
+
+    const rule = COLOR_PROTOCOL[matchedKey];
     if (!rule) continue;
 
-    btn.setAttribute("title", rule.label);
-    btn.setAttribute("aria-label", rule.label);
     btn.style.cursor = "pointer";
 
+    // Dynamic Intercept: Overwrite attributes right on hover to defeat Fluent updates
     if (!btn.dataset.cpBound) {
       btn.addEventListener("mouseenter", () => {
+        // Enforce the custom protocol string right before the browser renders the tooltip bubble
+        btn.setAttribute("title", rule.label);
+        btn.setAttribute("aria-label", rule.label);
+
         btn.style.outline = `2px solid ${rule.hex}`;
         btn.style.outlineOffset = "2px";
+        log(`[INTERCEPT] Enforced academic label on hover: ${matchedKey}`);
       });
 
       btn.addEventListener("mouseleave", () => {
@@ -66,20 +97,14 @@ function injectTooltips(root) {
 }
 
 function attachColorObserver(doc, label, win) {
-  if (!doc || !doc.body) {
-    log(`[COLOR] Skipped invalid doc (${label})`);
-    return;
-  }
+  if (!doc || !doc.body) return;
 
-  // Prevent duplicate observer layouts safely
   if (doc._cpObserver) {
     try {
       doc._cpObserver.disconnect();
     } catch (e) {}
-    log(`[COLOR] Existing observer disconnected (${label})`);
   }
 
-  // Run immediate validation check
   injectTooltips(doc);
 
   const observer = new doc.defaultView.MutationObserver((mutations) => {
@@ -94,7 +119,6 @@ function attachColorObserver(doc, label, win) {
           (typeof node.querySelector === "function" &&
             node.querySelector(".colors"))
         ) {
-          log("[COLOR] Popup detected → injecting custom tooltips");
           injectTooltips(node);
         }
       }
@@ -105,13 +129,10 @@ function attachColorObserver(doc, label, win) {
     observer.observe(doc.body, { childList: true, subtree: true });
     doc._cpObserver = observer;
 
-    // Catalog inside global collection instance array maps
     if (!openColorObservers.has(win)) {
       openColorObservers.set(win, []);
     }
     openColorObservers.get(win).push({ doc: doc, observer: observer });
-
-    log(`[COLOR] Observer attached successfully → ${label}`);
   } catch (err) {
     log(
       `[COLOR ERROR] Failed attaching observer to context ${label}: ${err.message}`,
@@ -120,22 +141,12 @@ function attachColorObserver(doc, label, win) {
 }
 
 function applyColorProtocol(win) {
-  if (!win || !win.document) {
-    log("[COLOR] Invalid target window frame context object reference");
-    return;
-  }
+  if (!win || !win.document) return;
 
   try {
-    // 1. Root main layout layer document
     attachColorObserver(win.document, "Main Window", win);
 
-    // 2. Tab interface iframe traversal loop sweep
     const frames = win.document.querySelectorAll("iframe, browser");
-    log(
-      `[COLOR] Processing ${frames.length} embedded tabs / sub-frame documents`,
-    );
-
-    let hooked = 0;
     for (let i = 0; i < frames.length; i++) {
       try {
         const contentDoc = frames[i].contentDocument;
@@ -145,17 +156,9 @@ function applyColorProtocol(win) {
             `Embedded Frame Layer Slot #${i}`,
             win,
           );
-          hooked++;
         }
-      } catch (e) {
-        log(
-          `[COLOR] Embedded frame context index [${i}] currently inaccessible`,
-        );
-      }
+      } catch (e) {}
     }
-    log(
-      `[COLOR] Successfully connected ${hooked}/${frames.length} total active views`,
-    );
   } catch (e) {
     log(`[COLOR CRITICAL EXCEPTION] Error navigating frame trees: ${e}`);
   }
@@ -163,13 +166,9 @@ function applyColorProtocol(win) {
 
 /* ==============================================================================
    PANEL SORT DESIGN MODULE
-   ============================================================================== */
+   ============================================================================= */
 function applyFlexLayoutHack(win) {
-  if (!win || !win.document) {
-    log("[LAYOUT] Invalid window target structure.");
-    return;
-  }
-
+  if (!win || !win.document) return;
   const doc = win.document;
 
   function tryApply() {
@@ -185,75 +184,82 @@ function applyFlexLayoutHack(win) {
     return false;
   }
 
-  // Attempt instant application sequence
-  if (tryApply()) {
-    log("[LAYOUT] Applied immediately via raw memory lookup pass.");
-    try {
-      applyColorProtocol(win);
-    } catch (e) {
-      log("[COLOR] Error: " + e);
-    }
-    return;
-  }
+  if (tryApply()) return;
 
-  // Backoff layout observer mapping layer logic
   if (openLayoutObservers.has(win)) {
     try {
       openLayoutObservers.get(win).disconnect();
     } catch (e) {}
   }
 
-  let attempts = 0;
   const layoutObserver = new win.MutationObserver(() => {
-    attempts++;
-
     if (tryApply()) {
       layoutObserver.disconnect();
       openLayoutObservers.delete(win);
-      log(
-        `[LAYOUT] Applied via observer after ${attempts} layout mutation changes.`,
-      );
-
-      try {
-        applyColorProtocol(win);
-      } catch (e) {
-        log("[COLOR] Failure inside observer callback thread: " + e);
-      }
-    } else if (attempts % 25 === 0) {
-      log(
-        `[LAYOUT] Waiting on system node layout paint cycles... (Attempts: ${attempts})`,
-      );
     }
   });
 
   try {
     layoutObserver.observe(doc, { childList: true, subtree: true });
     openLayoutObservers.set(win, layoutObserver);
-    log("[LAYOUT] MutationObserver attached to document structure.");
   } catch (e) {
     log(`[LAYOUT CRITICAL ERROR] Binding observer failed: ${e.message}`);
   }
 }
 
 /* ==============================================================================
-   SYSTEM LIFE-CYCLE MANIFEST OPERATIONS
+   DYNAMIC TAB ACTIVATION MONITOR (RACE CONDITION FIX)
+   ============================================================================= */
+function listenToTabChanges(win) {
+  const doc = win.document;
+  if (!doc || !doc.body) return;
+
+  const globalSelectionTrigger = () => {
+    applyColorProtocol(win);
+  };
+  doc.body.addEventListener("mouseup", globalSelectionTrigger, false);
+
+  const mainUiObserver = new win.MutationObserver(() => {
+    const freshFrames = doc.querySelectorAll("iframe, browser");
+    let unhookedFrameFound = false;
+
+    freshFrames.forEach((frame) => {
+      try {
+        if (frame.contentDocument && !frame.contentDocument._cpObserver) {
+          unhookedFrameFound = true;
+        }
+      } catch (e) {}
+    });
+
+    if (unhookedFrameFound) {
+      win.setTimeout(() => applyColorProtocol(win), 350);
+    }
+  });
+
+  mainUiObserver.observe(doc.body, { childList: true, subtree: true });
+  activeTabListeners.set(win, {
+    observer: mainUiObserver,
+    doc: doc,
+    fallback: globalSelectionTrigger,
+  });
+
+  applyColorProtocol(win);
+}
+
+/* ==============================================================================
+   SYSTEM LIFECYCLE OPERATIONS
    ============================================================================== */
 function startup({ id, version, rootURI }) {
-  log(`[BOOT] Initializing system workspace layout plugin v${version}`);
+  Zotero.debug(
+    `[BOOT] Initializing system workspace layout plugin v${version}`,
+  );
 
   Zotero.uiReadyPromise.then(() => {
-    log("[BOOT] UI mapping layers completely populated.");
-
-    const windowsList = Zotero.getMainWindows();
-    log(`[BOOT] Detected ${windowsList.length} independent window contexts.`);
-
-    for (let w = 0; w < windowsList.length; w++) {
-      const activeWindow = windowsList[w];
-      // 100ms async timing separation gap step to let complex templates render safely inside desktop RAM
-      activeWindow.setTimeout(() => {
-        log(`[BOOT] Executing modifiers on window instance slot #${w}`);
-        applyFlexLayoutHack(activeWindow);
-      }, 100);
+    for (let win of Zotero.getMainWindows()) {
+      win.setTimeout(() => {
+        applyFlexLayoutHack(win);
+        listenToTabChanges(win);
+      }, 150);
     }
   });
 }
@@ -261,10 +267,6 @@ function startup({ id, version, rootURI }) {
 function shutdown() {
   log("[BOOT] Shutdown sequence initiated. Cleaning execution hooks.");
 
-  // 1. Terminate and clear all layout observers
-  log(
-    `[CLEANUP] Disconnecting ${openLayoutObservers.size} active main panel observers.`,
-  );
   for (let [win, observer] of openLayoutObservers.entries()) {
     try {
       observer.disconnect();
@@ -272,8 +274,18 @@ function shutdown() {
   }
   openLayoutObservers.clear();
 
-  // 2. Terminate and clear color tab annotation document observers
-  log("[CLEANUP] Disconnecting all embedded document observers across frames.");
+  for (let [win, targetObj] of activeTabListeners.entries()) {
+    try {
+      targetObj.observer.disconnect();
+      targetObj.doc.body.removeEventListener(
+        "mouseup",
+        targetObj.fallback,
+        false,
+      );
+    } catch (e) {}
+  }
+  activeTabListeners.clear();
+
   for (let [win, trackingVector] of openColorObservers.entries()) {
     trackingVector.forEach((entry) => {
       try {
@@ -284,7 +296,6 @@ function shutdown() {
       } catch (e) {}
     });
 
-    // 3. Gracefully reset CSS flex elements back to native application standards
     try {
       const doc = win.document;
       if (doc) {
@@ -300,9 +311,5 @@ function shutdown() {
   log("[BOOT] Clean workspace shutdown completed successfully.");
 }
 
-function install() {
-  log("[BOOT] Workspace extension install complete.");
-}
-function uninstall() {
-  log("[BOOT] Workspace extension completely removed.");
-}
+function install() {}
+function uninstall() {}
