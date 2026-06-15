@@ -21,17 +21,16 @@ function Write-Local-Dir-Plugin {
 }
 
 $from = $PWD
-$dir = "zotero-layout-modifier"
+$dir = "zotero-layout-lab"
 $currentHost = $env:COMPUTERNAME  # Works cross-platform in pwsh
 Write-Host "Current Hostname: $currentHost"
 
-$manifest = Get-Content "zotero-layout-modifier\manifest.json" -Raw | ConvertFrom-Json
+$manifest = Get-Content (Join-Path $dir "manifest.json") -Raw | ConvertFrom-Json
 $extensionId = $manifest.applications.zotero.id
-$custom = $manifest.__custom
+$custom = Get-Content (Join-Path $dir "zll.json") -Raw | ConvertFrom-Json
 
 if (
-    $manifest.__custom -and
-    $manifest.__custom.PSObject.Properties.Name -contains $currentHost
+    $custom.computer_specific_profiles.PSObject.Properties.Name -contains $currentHost
 ) {
     # ok
 } else {
@@ -59,7 +58,7 @@ if (Test-Path $dir -PathType Container) {
         Remove-Item "..\$dir-*.xpi" -Force
     }
 
-	$SrcDir = "$PSScriptRoot\zotero-layout-modifier\"
+	$SrcDir = (Join-Path $PSScriptRoot $dir)
 
 	$FileList = @(
 		(Join-Path $SrcDir "bootstrap.js")
