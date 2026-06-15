@@ -5,27 +5,17 @@
   "description": "Reorders right hand side panels, renames annotation colors, ...",
   "author": "Zotero",
   "icons": {
-    "48": "up3.ico",
-    "96": "up3.ico"
+    "32": "icons/zll-logo-32x.png",
+    "64": "icons/zll-logo-64x.png",
+    "128": "icons/zll-logo-128x.png",
+    "256": "icons/zll-logo-256x.png"
   },
   "applications": {
     "zotero": {
-      "id": "zotero-layout-modifier@aritakku",
-      "update_url": "https://aritakku.github.io/zotero/zotero-layout-modifier/updates.json",
+      "id": "zotero-layout-lab@ari.takku.fi",
+      "update_url": "https://aritakku.github.io/zotero/zotero-layout-lab/updates.json",
       "strict_min_version": "6.999",
       "strict_max_version": "9.0.*"
     }
-  },
-  "__custom" : {		
-   	"PRECISION-3680-": {
-      "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
-      "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-modifier\\",
-      "_comment" : ""
-  	}, 
-  	"PROBOOK...?" : {
-      "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
-      "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-modifier\\",
-      "_comment" : ""
-	  }
   }
 }

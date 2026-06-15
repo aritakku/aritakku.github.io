@@ -1,0 +1,15 @@
+{
+  "computer_specific_profiles" : true,
+  "computers" : {		
+   	"PRECISION-3680-": {
+            "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
+            "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-lab\\",
+            "_comment" : ""
+  	}, 
+  	"PROBOOK...?" : {
+            "zotero_extension_dir": "C:\\Users\\Takku\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\rn310doe.default\\extensions\\",
+            "codebase" : "C:\\Work\\GitHub\\aritakku.github.io\\zotero\\zotero-layout-lab\\",
+            "_comment" : ""
+	  }
+  }
+}
