@@ -1,12 +1,15 @@
 {
   "manifest_version": 2,
   "name": "Zotero Layout Lab",
-  "version": "1.0.7",
-  "description": "Reorders right hand side panels, renames annotation colors, ...",
-  "author": "Zotero",
+  "version": "1.0.10.26",
+  "description": "Zotero Layout Lab",
+  "homepage_url": "https://aritakku.github.io/zotero/zotero-layout-lab/#readme",
+  "author": "aritakku",
   "icons": {
     "32": "icons/zll-logo-32x.png",
+    "48": "icons/zll-logo-64x.png",
     "64": "icons/zll-logo-64x.png",
+    "96": "icons/zll-logo-96x.png",
     "128": "icons/zll-logo-128x.png",
     "256": "icons/zll-logo-256x.png"
   },
@@ -15,7 +18,7 @@
       "id": "zotero-layout-lab@ari.takku.fi",
       "update_url": "https://aritakku.github.io/zotero/zotero-layout-lab/updates.json",
       "strict_min_version": "6.999",
-      "strict_max_version": "9.0.*"
+      "strict_max_version": "10.*"
     }
   }
 }
