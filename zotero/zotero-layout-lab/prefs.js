@@ -39,3 +39,14 @@ pref("extensions.zotero.zotero-layout-lab.schema.yellow.logic", "CONTEXT");
 pref("extensions.zotero.zotero-layout-lab.schema.yellow.functionText", "General narrative and supporting background.");
 pref("extensions.zotero.zotero-layout-lab.schema.yellow.obsidian", "literature-note");
 pref("extensions.zotero.zotero-layout-lab.schema.yellow.emoji", "yellow_circle");
+
+
+
+pref("extensions.zotero.zotero-layout-lab.order.info-box", 1);
+pref("extensions.zotero.zotero-layout-lab.order.abstract", 2);
+pref("extensions.zotero.zotero-layout-lab.order.attachments", 3);
+pref("extensions.zotero.zotero-layout-lab.order.notes", 4);
+pref("extensions.zotero.zotero-layout-lab.order.attachment-annotations", 5);
+pref("extensions.zotero.zotero-layout-lab.order.libraries-collections", 6);
+pref("extensions.zotero.zotero-layout-lab.order.tags", 7);
+pref("extensions.zotero.zotero-layout-lab.order.related", 8);

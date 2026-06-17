@@ -1,69 +1,43 @@
 <linkset>
   <html:link rel="localization" href="zotero-layout-lab-preferences.ftl" />
 </linkset>
-<vbox
-  id="zotero-prefpane-zotero-layout-lab"
-  onload="Zotero.ZoteroLayoutLabel.hooks.onPrefsEvent('load', { window })"
->
-  <groupbox>
-    <html:h2>Zotero Layout Lab Settings</html:h2>
-    <hbox align="center">
-      <label>Layout Mutation Intensity Level</label>
-      <html:input
-        type="range"
-        min="10"
-        max="100"
-        step="10"
-        preference="extensions.zotero-layout-lab.intensity"
-      >
-      </html:input>
-    </hbox>
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:html="http://www.w3.org/1999/xhtml">
+
+  <html:h2>Zotero Layout Lab Settings</html:h2>
+
+
+    <groupbox style="margin-top: 15px; padding: 10px;">
+      <label><html:h2>Side Pane Section Order</html:h2></label>
+      <description style="margin-bottom: 10px; color: #666;">
+        Assign sequential numbers to arrange the panels. Lower numbers float to the top.
+      </description>
+
+      <html:div style="display: grid; grid-template-columns: 220px 80px; gap: 8px; align-items: center;">
+        <label value="Info Box Layout Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.info-box" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Abstract Panel Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.abstract" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Attachments Box Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachments" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Item Notes Box Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.notes" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Attachment Annotations Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachment-annotations" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Libraries &amp; Collections Box:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.libraries-collections" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Item Tags Box Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.tags" style="padding:4px; border:1px solid #ccc; width:60px;" />
+
+        <label value="Related Items Box Sequence:" />
+        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.related" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      </html:div>
   </groupbox>
 
-  <groupbox>
-    <html:p data-l10n-id="settingsync-pref-description" style="margin: 0 0 8px 0"></html:p>
-    <html:p
-      data-l10n-id="settingsync-pref-note"
-      style="margin: 0 0 16px 0; color: #888; font-size: 0.9em"
-    ></html:p>
-
-    <vbox style="margin: 0 0 12px 0; gap: 4px">
-      <checkbox
-        id="prefsync-cat-zoteroPreferences"
-        data-l10n-id="settingsync-pref-cat-zotero-preferences"
-        checked="true"
-      />
-      <checkbox
-        id="prefsync-cat-pluginPreferences"
-        data-l10n-id="settingsync-pref-cat-plugin-preferences"
-        checked="true"
-      />
-      <checkbox
-        id="prefsync-cat-installedPlugins"
-        data-l10n-id="settingsync-pref-cat-installed-plugins"
-        checked="true"
-      />
-      <checkbox
-        id="prefsync-cat-citationStyles"
-        data-l10n-id="settingsync-pref-cat-citation-styles"
-        checked="true"
-      />
-      <checkbox
-        id="prefsync-cat-siteSettings"
-        data-l10n-id="settingsync-pref-cat-site-settings"
-        checked="true"
-      />
-    </vbox>
-
-    <hbox style="gap: 12px">
-      <button id="prefsync-btn-sync" data-l10n-id="settingsync-pref-btn-sync" />
-      <button id="prefsync-btn-apply" data-l10n-id="settingsync-pref-btn-apply" />
-    </hbox>
-
-    <html:p id="prefsync-status" style="margin: 16px 0 0 0"></html:p>
-    <html:p
-      id="prefsync-last-sync"
-      style="margin: 4px 0 0 0; color: #888; font-size: 0.9em"
-    ></html:p>
-  </groupbox>
 </vbox>
