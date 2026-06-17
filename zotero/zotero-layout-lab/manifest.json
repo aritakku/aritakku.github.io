@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Zotero Layout Lab",
-  "version": "1.0.10.29",
-  "description": "Zotero Layout Lab",
+  "version": "1.0.10.30",
+  "description": "Zotero Layout Lab: Toolbox sorting, Annotation labels...",
   "homepage_url": "https://aritakku.github.io/zotero/zotero-layout-lab/#readme",
   "applications": {
     "zotero": {
@@ -12,20 +12,13 @@
       "strict_max_version": "10.*"
     }
   },
-  "preferences": [
-    {
-      "id": "zotero-layout-lab-prefs",
-      "label": "Zotero Layout Lab",
-      "source": "prefs.html"
-    }
-  ],
   "author": "aritakku",
   "icons": {
-    "32": "icons/zll-logo-32x.png",
-    "48": "icons/zll-logo-64x.png",
-    "64": "icons/zll-logo-64x.png",
-    "96": "icons/zll-logo-96x.png",
-    "128": "icons/zll-logo-128x.png",
-    "256": "icons/zll-logo-256x.png"
+    "32": "chrome://zotero-layout-lab/content/icons/zll-logo-32x.png",
+    "48": "chrome://zotero-layout-lab/content/icons/zll-logo-64x.png",
+    "64": "chrome://zotero-layout-lab/content/icons/zll-logo-64x.png",
+    "96": "chrome://zotero-layout-lab/content/icons/zll-logo-128x.png",
+    "128": "chrome://zotero-layout-lab/content/icons/zll-logo-128x.png",
+    "256": "chrome://zotero-layout-lab/content/icons/zll-logo-256x.png"
   }
 }

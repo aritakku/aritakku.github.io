@@ -1,0 +1,69 @@
+<linkset>
+  <html:link rel="localization" href="zotero-layout-lab-preferences.ftl" />
+</linkset>
+<vbox
+  id="zotero-prefpane-zotero-layout-lab"
+  onload="Zotero.ZoteroLayoutLabel.hooks.onPrefsEvent('load', { window })"
+>
+  <groupbox>
+    <html:h2>Zotero Layout Lab Settings</html:h2>
+    <hbox align="center">
+      <label>Layout Mutation Intensity Level</label>
+      <html:input
+        type="range"
+        min="10"
+        max="100"
+        step="10"
+        preference="extensions.zotero-layout-lab.intensity"
+      >
+      </html:input>
+    </hbox>
+  </groupbox>
+
+  <groupbox>
+    <html:p data-l10n-id="settingsync-pref-description" style="margin: 0 0 8px 0"></html:p>
+    <html:p
+      data-l10n-id="settingsync-pref-note"
+      style="margin: 0 0 16px 0; color: #888; font-size: 0.9em"
+    ></html:p>
+
+    <vbox style="margin: 0 0 12px 0; gap: 4px">
+      <checkbox
+        id="prefsync-cat-zoteroPreferences"
+        data-l10n-id="settingsync-pref-cat-zotero-preferences"
+        checked="true"
+      />
+      <checkbox
+        id="prefsync-cat-pluginPreferences"
+        data-l10n-id="settingsync-pref-cat-plugin-preferences"
+        checked="true"
+      />
+      <checkbox
+        id="prefsync-cat-installedPlugins"
+        data-l10n-id="settingsync-pref-cat-installed-plugins"
+        checked="true"
+      />
+      <checkbox
+        id="prefsync-cat-citationStyles"
+        data-l10n-id="settingsync-pref-cat-citation-styles"
+        checked="true"
+      />
+      <checkbox
+        id="prefsync-cat-siteSettings"
+        data-l10n-id="settingsync-pref-cat-site-settings"
+        checked="true"
+      />
+    </vbox>
+
+    <hbox style="gap: 12px">
+      <button id="prefsync-btn-sync" data-l10n-id="settingsync-pref-btn-sync" />
+      <button id="prefsync-btn-apply" data-l10n-id="settingsync-pref-btn-apply" />
+    </hbox>
+
+    <html:p id="prefsync-status" style="margin: 16px 0 0 0"></html:p>
+    <html:p
+      id="prefsync-last-sync"
+      style="margin: 4px 0 0 0; color: #888; font-size: 0.9em"
+    ></html:p>
+  </groupbox>
+</vbox>

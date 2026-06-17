@@ -1,9 +1,13 @@
-ZLLBoxSorter = {
+this.ZLLBoxSorterObj = {
   id: null,
   version: null,
   rootURI: null,
   initialized: false,
   addedElementIDs: [],
+  verifiedTagsBoxId: "zotero-editpane-tags",
+  verifiedInfoBoxId: "zotero-editpane-info-box",
+
+  openLayoutObservers: new Map(),
 
   init({ id, version, rootURI }) {
     if (this.initialized) return;
@@ -20,6 +24,8 @@ ZLLBoxSorter = {
   execute() {
     this.addToAllWindows();
   },
+
+  destroy() {},
 
   /* ==============================================================================
     RIGHT-HAND SIDE PANEL TAG SORTING (FLEXBOX OVERRIDE)
@@ -77,7 +83,10 @@ ZLLBoxSorter = {
     for (let id of this.addedElementIDs) {
       doc.getElementById(id)?.remove();
     }
-    doc.querySelector('[href="make-it-red.ftl"]').remove();
+    var link = doc.querySelector('[href="zotero-layout-lab.ftl"]');
+    if (link) {
+      link.remove();
+    }
   },
 
   removeFromAllWindows() {
@@ -95,7 +104,7 @@ ZLLBoxSorter = {
 
     // Retrieve a global pref
     this.log(
-      `Intensity is ${Zotero.Prefs.get("extensions.make-it-red.intensity", true)}`,
+      `Pref test value = ${Zotero.Prefs.get("extensions.zotero.zotero-layout-lab.pref.test", true)}`,
     );
   },
 };

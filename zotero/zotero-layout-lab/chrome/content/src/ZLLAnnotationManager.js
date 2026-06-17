@@ -1,9 +1,11 @@
-ZLLAnnotationManager = {
+this.ZLLAnnotationManagerObj = {
   id: null,
   version: null,
   rootURI: null,
   initialized: false,
   addedElementIDs: [],
+  schemaBase: "extensions.zotero.zotero-layout-lab.schema.",
+  schemaColors: ["purple", "blue", "orange", "green", "red", "magenta", "gray", "yellow"],
 
   init({ id, version, rootURI }) {
     if (this.initialized) return;
@@ -21,6 +23,50 @@ ZLLAnnotationManager = {
     this.addToAllWindows();
   },
 
+  destroy() {
+    this.removeFromAllWindows();
+  },
+
+  /**
+   * Reads flat Zotero configuration keys and reconstructs the memory schema object
+   */
+  loadSchemaFromPrefs() {
+    const colors = this.schemaColors;
+    const basePref = this.schemaBase;
+    const loadedSchema = {};
+
+    for (let color of colors) {
+      loadedSchema[color] = {
+        logic: Zotero.Prefs.get(`${basePref}${color}.logic`, true),
+        functionText: Zotero.Prefs.get(`${basePref}${color}.functionText`, true),
+        obsidian: Zotero.Prefs.get(`${basePref}${color}.obsidian`, true),
+        emoji: Zotero.Prefs.get(`${basePref}${color}.emoji`, true)
+      };
+    }
+    
+    this.schema = loadedSchema;
+    return this.schema;
+  },
+
+  /**
+   * flattens an active memory schema object out and persists it directly into Zotero prefs
+   */
+  saveSchemaToPrefs(schemaObject) {
+    const targetSchema = schemaObject || this.schema;
+    if (!targetSchema) return;
+
+    const basePref = this.schemaBase;
+
+    for (let color in targetSchema) {
+      if (targetSchema.hasOwnProperty(color)) {
+        Zotero.Prefs.set(`${basePref}${color}.logic`, targetSchema[color].logic);
+        Zotero.Prefs.set(`${basePref}${color}.functionText`, targetSchema[color].functionText);
+        Zotero.Prefs.set(`${basePref}${color}.obsidian`, targetSchema[color].obsidian);
+        Zotero.Prefs.set(`${basePref}${color}.emoji`, targetSchema[color].emoji);
+      }
+    }
+  },
+
   addToWindow(window) {
     let doc = window.document;
 
@@ -29,7 +75,7 @@ ZLLAnnotationManager = {
     link1.id = "zll-stylesheet";
     link1.type = "text/css";
     link1.rel = "stylesheet";
-    link1.href = this.rootURI + "style.css";
+    link1.href = "chrome://zotero-layout-lab/chrome/content/styles/zll.css";
     doc.documentElement.appendChild(link1);
     this.storeAddedElement(link1);
 
@@ -43,7 +89,7 @@ ZLLAnnotationManager = {
     menuitem.setAttribute("data-l10n-id", "make-it-red-green-instead");
     // MozMenuItem#checked is available in Zotero 7
     menuitem.addEventListener("command", () => {
-      MakeItRed.toggleGreen(window, menuitem.checked);
+      alert("addToWindow, line 50");
     });
     doc.getElementById("menu_viewPopup").appendChild(menuitem);
     this.storeAddedElement(menuitem);
