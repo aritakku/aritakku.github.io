@@ -1,4 +1,4 @@
-this.ZoteroLayoutLab = {
+ZoteroLayoutLab = {
   ZOTERO_ID: "zotero-layout-lab@ari.takku.fi",
   id: null,
   version: null,
@@ -9,6 +9,7 @@ this.ZoteroLayoutLab = {
   ZLLBoxSorter: null,
 
   init({ id, version, rootURI }, managerInstance, sorterInstance) {
+    this.log(`DBG: init id:${id}, version:${version}`);
     if (this.initialized) return;
     this.id = id;
     this.version = version;
@@ -27,31 +28,15 @@ this.ZoteroLayoutLab = {
     Zotero.debug("[ZLL MASTER]: " + msg);
   },
 
-  checkPropsExist() {
-    var ok = true;
-    // Initialize sub-managers safely
-    if (!this.ZLLAnnotationManager) { 
-      this.log("ERROR: No ZLLAnnotationManager");
-      ok = false;
-    }
-
-    if (!this.ZLLBoxSorter) {      
-      this.log("ERROR: No ZLLBoxSorter");
-      ok = false;
-    }
-    return ok;
-  },
 
   execute() {
-    if (this.checkPropsExist()) {
+    this.log(`DBG: execute`);
       this.ZLLAnnotationManager.execute();
       this.ZLLBoxSorter.execute();
-    } else {
-      this.log("ERROR: Could not execute.");
-    }
   },
 
   destroy() {
+    this.log(`DBG: destroy`);
     if (this.ZLLAnnotationManager) {
       this.ZLLAnnotationManager.destroy();
     }
@@ -64,34 +49,36 @@ this.ZoteroLayoutLab = {
   },
 
   async main() {
-    if (this.checkPropsExist()) {
+      this.log(`DBG: await main`);
+
       await this.ZLLAnnotationManager.main();
       await this.ZLLBoxSorter.main();  
-    } else {
-      this.log("ERROR: Could not execute.");
-    }
   },
 
   async onMainWindowLoad({ window }, reason) {
-    if (this.ZLLAnnotationManager) this.ZLLAnnotationManager.addToWindow(window);
-    if (this.ZLLBoxSorter) this.ZLLBoxSorter.addToWindow(window);
+    this.log(`DBG: onMainWindowLoad`);
+    this.ZLLAnnotationManager.addToWindow(window);
+    this.ZLLBoxSorter.addToWindow(window);
   },
 
   async onMainWindowUnload({ window }, reason) {
-    if (this.ZLLAnnotationManager) this.ZLLAnnotationManager.removeFromWindow(window);
-    if (this.ZLLBoxSorter) this.ZLLBoxSorter.removeFromWindow(window);
+    this.log(`DBG: onMainWindowUnLoad`);
+    this.ZLLAnnotationManager.removeFromWindow(window);
+    this.ZLLBoxSorter.removeFromWindow(window);
   },
 
   /* ==============================================================================
      MASTER APPLICATION WINDOW ROUTERS (Bound directly from bootstrap hooks)
      ============================================================================== */
   addToWindow(window) {
-    if (this.ZLLAnnotationManager) this.ZLLAnnotationManager.addToWindow(window);
-    if (this.ZLLBoxSorter) this.ZLLBoxSorter.addToWindow(window);
+    this.log(`DBG: addToWindow`);
+    this.ZLLAnnotationManager.addToWindow(window);
+    this.ZLLBoxSorter.addToWindow(window);
   },
 
   removeFromWindow(window) {
-    if (this.ZLLAnnotationManager) this.ZLLAnnotationManager.removeFromWindow(window);
-    if (this.ZLLBoxSorter) this.ZLLBoxSorter.removeFromWindow(window);
+    this.log(`DBG: removeFromWindow`);
+    this.ZLLAnnotationManager.removeFromWindow(window);
+    this.ZLLBoxSorter.removeFromWindow(window);
   }
 };

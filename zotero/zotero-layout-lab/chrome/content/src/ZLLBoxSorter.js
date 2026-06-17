@@ -1,12 +1,14 @@
-this.ZLLBoxSorterObj = {
+ZLLBoxSorterObj = {
   id: null,
   version: null,
   rootURI: null,
   initialized: false,
   addedElementIDs: [],
-  prefObserverId: null,
-
+  verifiedTagsBoxId: "zotero-editpane-tags",
+  verifiedInfoBoxId: "zotero-editpane-info-box",
+  
   openLayoutObservers: new Map(),
+  prefObserverId: null, // Added to track our preference channel lifecycle
 
   init({ id, version, rootURI }) {
     if (this.initialized) return;
@@ -23,67 +25,74 @@ this.ZLLBoxSorterObj = {
   execute() {
     this.addToAllWindows();
 
-    // Register a live branch observer hook to capture real-time changes
-    this.prefObserverId = Zotero.Prefs.registerObserver(
-      "zotero-layout-lab.order", 
-      () => {
-        Zotero.debug("[ZLL Sorter] Order preference change detected. Realigning layout panes...");
-        this.addToAllWindows(); // Re-runs the mapping loop across windows immediately
-      }
-    );
+    // LIVE UPDATE LINK: Listen specifically to any mutations inside the order branch
+    if (!this.prefObserverId) {
+      this.prefObserverId = Zotero.Prefs.registerObserver(
+        "zotero-layout-lab.order",
+        () => {
+          this.log("Preference shift detected! Re-applying dynamic layout sort rules...");
+          this.addToAllWindows(); // Re-runs layout logic across all open windows instantly
+        }
+      );
+    }
   },
-  destroy() {},
 
-  /* ==============================================================================
-     DYNAMIC RIGHT-HAND SIDE PANEL SORTING ARCHITECTURE
-     ============================================================================== */
   applyFlexLayoutHack(win) {
     if (!win || !win.document) return;
     const doc = win.document;
+    const self = this;
 
-    // Define the structural ID lookup map
-    const layoutElements = [
-      { id: "zotero-editpane-info-box",            pref: "info-box" },
-      { id: "zotero-editpane-abstract",            pref: "abstract" },
-      { id: "zotero-editpane-attachments",         pref: "attachments" },
-      { id: "zotero-editpane-notes",               pref: "notes" },
-      { id: "zotero-editpane-attachment-annotations", pref: "attachment-annotations" },
-      { id: "zotero-editpane-libraries-collections", pref: "libraries-collections" },
-      { id: "zotero-editpane-tags",                pref: "tags" },
-      { id: "zotero-editpane-related",             pref: "related" }
+    // The sub-keys mapping to your preferences registry paths
+    const layoutItems = [
+      "info-box",
+      "abstract",
+      "attachments",
+      "notes",
+      "attachment-annotations",
+      "libraries-collections",
+      "tags",
+      "related"
     ];
 
     const tryApplyDynamicSort = () => {
       let appliedAny = false;
 
-      layoutElements.forEach(item => {
-        const domNode = doc.getElementById(item.id);
-        if (domNode) {
-          const preferenceKey = `extensions.zotero.zotero-layout-lab.order.${item.pref}`;
-          const targetOrderValue = Zotero.Prefs.get(preferenceKey, true);
-          
-          // Apply order immediately onto whatever layout blocks are currently visible
-          domNode.style.order = String(targetOrderValue);
-          appliedAny = true;
+      layoutItems.forEach(key => {
+        // 1. Fetch the physical element ID string from preferences
+        const idPrefKey = `extensions.zotero.zotero-layout-lab.id.${key}`;
+        const targetElementId = Zotero.Prefs.get(idPrefKey, true);
 
-          this.log(`DEBUG: item.id: ${item.id}, preferenceKey: ${preferenceKey}, targetOrderValue: ${targetOrderValue}`)
+        if (targetElementId) {
+          // 2. Locate the DOM element using the dynamically fetched ID
+          const domNode = doc.getElementById(targetElementId);
+          
+          if (domNode) {
+            // 3. Fetch the sorting integer order from preferences
+            const orderPrefKey = `extensions.zotero.zotero-layout-lab.order.${key}`;
+            const targetOrderValue = Zotero.Prefs.get(orderPrefKey, true);
+            
+            // 4. Apply the styles rule
+            domNode.style.order = String(targetOrderValue);
+            appliedAny = true;
+
+            // Optional trace logging
+            // self.log(`Sorted Element [${targetElementId}] with priority order [${targetOrderValue}]`);
+          }
         }
       });
 
       return appliedAny;
     };
 
-    // Run lookups immediately
-    if (tryApplyDynamicSort()) {
-      // Don't stop entirely on first match, because switching items in Zotero re-renders the DOM dynamically!
-    }
+    // Run layout modifications immediately
+    tryApplyDynamicSort();
 
-    // Clear old existing interval slots to prevent thread accumulation
+    // Clear background interval gaps to keep execution thread clean
     if (this.openLayoutObservers.has(win)) {
       win.clearInterval(this.openLayoutObservers.get(win));
     }
 
-    // Keep checking periodically to catch dynamic pane changes when a user changes selected items
+    // Keep checking recursively to handle React re-renders when switching selected items
     const intervalId = win.setInterval(() => {
       tryApplyDynamicSort();
     }, 300);
@@ -103,48 +112,36 @@ this.ZLLBoxSorterObj = {
     }
   },
 
-  storeAddedElement(elem) {
-    if (!elem.id) {
-      throw new Error("Element must have an id");
-    }
-    this.addedElementIDs.push(elem.id);
-  },
-
   removeFromWindow(window) {
     var doc = window.document;
 
-    // Clear background interval timers
+    // 1. Stop background interval checks for this window context frame
     if (this.openLayoutObservers.has(window)) {
       window.clearInterval(this.openLayoutObservers.get(window));
       this.openLayoutObservers.delete(window);
     }
 
-    // Reset inline Flexbox order priorities to default state
-    const ids = [
-      "zotero-editpane-info-box", "zotero-editpane-abstract", "zotero-editpane-attachments",
-      "zotero-editpane-notes", "zotero-editpane-attachment-annotations",
-      "zotero-editpane-libraries-collections", "zotero-editpane-tags", "zotero-editpane-related"
+    // 2. Dynamically reset layout modification priorities back to default state
+    const layoutItems = [
+      "info-box", "abstract", "attachments", "notes",
+      "attachment-annotations", "libraries-collections", "tags", "related"
     ];
-    ids.forEach(id => {
-      const node = doc.getElementById(id);
-      if (node) node.style.order = ""; // Deletes custom sequence numbers cleanly
+
+    layoutItems.forEach(key => {
+      const idPrefKey = `extensions.zotero.zotero-layout-lab.id.${key}`;
+      const targetElementId = Zotero.Prefs.get(idPrefKey, true);
+      
+      if (targetElementId) {
+        const node = doc.getElementById(targetElementId);
+        if (node) {
+          node.style.order = ""; // Resets CSS order property
+        }
+      }
     });
-
-    // Remove custom generated items from your tracking cache arrays
-    for (let id of this.addedElementIDs) {
-      doc.getElementById(id)?.remove();
-    }
-    this.addedElementIDs = [];
-
-    var link = doc.querySelector('[href="zotero-layout-lab.ftl"]');
-    if (link) {
-      link.remove();
-    }
-
   },
 
   removeFromAllWindows() {
-    // 1. Clear active preferences observer channel
+    // Teardown the preference observer channel safely to prevent profile background memory leaks
     if (this.prefObserverId) {
       Zotero.Prefs.unregisterObserver(this.prefObserverId);
       this.prefObserverId = null;
@@ -157,14 +154,12 @@ this.ZLLBoxSorterObj = {
     }
   },
 
-  async main() {
-    // Global properties are included automatically in Zotero 7
-    var host = new URL("https://foo.com/path").host;
-    this.log(`Host is ${host}`);
-
-    // Retrieve a global pref
-    this.log(
-      `Pref test value = ${Zotero.Prefs.get("extensions.zotero.zotero-layout-lab.pref.test", true)}`,
-    );
+  destroy() {
+    this.removeFromAllWindows();
+    this.initialized = false;
   },
+
+  async main() {
+    this.log("Box Sorter Engine Subsystem Initialized Active.");
+  }
 };

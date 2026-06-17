@@ -1,4 +1,4 @@
-this.ZLLAnnotationManagerObj = {
+ZLLAnnotationManagerObj = {
   id: null,
   version: null,
   rootURI: null,

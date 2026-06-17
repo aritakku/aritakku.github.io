@@ -42,11 +42,22 @@ pref("extensions.zotero.zotero-layout-lab.schema.yellow.emoji", "yellow_circle")
 
 
 
+// Layout DOM Element IDs
+pref("extensions.zotero.zotero-layout-lab.id.info-box", "zotero-editpane-info-box");
+pref("extensions.zotero.zotero-layout-lab.id.abstract", "zotero-editpane-abstract");
+pref("extensions.zotero.zotero-layout-lab.id.attachments", "zotero-editpane-attachments");
+pref("extensions.zotero.zotero-layout-lab.id.notes", "zotero-editpane-notes");
+pref("extensions.zotero.zotero-layout-lab.id.attachment-annotations", "zotero-editpane-attachment-annotations");
+pref("extensions.zotero.zotero-layout-lab.id.libraries-collections", "zotero-editpane-libraries-collections");
+pref("extensions.zotero.zotero-layout-lab.id.tags", "zotero-editpane-tags");
+pref("extensions.zotero.zotero-layout-lab.id.related", "zotero-editpane-related");
+
+// Sorting Order Sequences (Defaults)
 pref("extensions.zotero.zotero-layout-lab.order.info-box", 1);
 pref("extensions.zotero.zotero-layout-lab.order.abstract", 2);
 pref("extensions.zotero.zotero-layout-lab.order.attachments", 3);
 pref("extensions.zotero.zotero-layout-lab.order.notes", 4);
 pref("extensions.zotero.zotero-layout-lab.order.attachment-annotations", 5);
 pref("extensions.zotero.zotero-layout-lab.order.libraries-collections", 6);
-pref("extensions.zotero.zotero-layout-lab.order.tags", 7);
+pref("extensions.zotero.zotero-layout-lab.order.tags", -1);
 pref("extensions.zotero.zotero-layout-lab.order.related", 8);

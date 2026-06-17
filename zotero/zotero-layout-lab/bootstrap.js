@@ -39,43 +39,61 @@ async function startup({ id, version, resourceURI, rootURI }, reason) {
    * and all child variables assigned to it is globally accessible.
    * See `src/index.ts` for details.
    */
-  const ctx = {
-    rootURI,
-    Zotero,
-  };
+  const ctx = Object.create(null);
+  ctx.rootURI = rootURI;
+  ctx.Zotero = Zotero;
+  ctx.Services = Services;
+  ctx.Components = Components;
+  ctx.ZoteroLayoutLab = null;
+  ctx.ZLLAnnotationManagerObj = null;
+  ctx.ZLLBoxSorterObj = null;
+  
   ctx._globalThis = ctx;
 
-  Services.scriptloader.loadSubScript(
-    rootURI + "/chrome/content/src/ZLLAnnotationManager.js",
-    ctx,
-  );
-  Services.scriptloader.loadSubScript(
-    rootURI + "/chrome/content/src/ZLLBoxSorter.js",
-    ctx,
-  );
-  Services.scriptloader.loadSubScript(
-    rootURI + "/chrome/content/src/ZoteroLayoutLab.js",
-    ctx,
-  );
+  try {
 
-  // Extract properties cleanly checking both sandbox reference scopes safely
-  let managerInstance = ctx.ZLLAnnotationManagerObj || ctx._globalThis.ZLLAnnotationManagerObj;
-  let sorterInstance = ctx.ZLLBoxSorterObj || ctx._globalThis.ZLLBoxSorterObj;
-  ZoteroLayoutLab = ctx.ZoteroLayoutLab || ctx._globalThis.ZoteroLayoutLab;
-
-  if (!ZoteroLayoutLab) {
-    throw new Error(
-      "[ZLL] Failed to resolve master ZoteroLayoutLab module from evaluation sandbox.",
+    Services.scriptloader.loadSubScript(
+      rootURI + "/chrome/content/src/ZLLAnnotationManager.js",
+      ctx,
     );
-  }
+    Services.scriptloader.loadSubScript(
+      rootURI + "/chrome/content/src/ZLLBoxSorter.js",
+      ctx,
+    );
+    Services.scriptloader.loadSubScript(
+      rootURI + "/chrome/content/src/ZoteroLayoutLab.js",
+      ctx,
+    );
 
-  ZoteroLayoutLab.init({ id, version, rootURI }, managerInstance, sorterInstance);
-  await ZoteroLayoutLab.main();
+    // Extract properties cleanly checking both sandbox reference scopes safely
+    let managerInstance = ctx.ZLLAnnotationManagerObj || ctx._globalThis.ZLLAnnotationManagerObj;
+    let sorterInstance = ctx.ZLLBoxSorterObj || ctx._globalThis.ZLLBoxSorterObj;
+    ZoteroLayoutLab = ctx.ZoteroLayoutLab || ctx._globalThis.ZoteroLayoutLab;
+
+    if (!ZoteroLayoutLab || !managerInstance || !sorterInstance) {
+        this.log("[CRITICAL ERROR] Failed to resolve master ZoteroLayoutLab module from evaluation sandbox.");  
+        throw new Error("[ZLL] Failed to resolve master ZoteroLayoutLab module from evaluation sandbox.");
+    }
+
+    ZoteroLayoutLab.init({ id, version, rootURI }, managerInstance, sorterInstance);
+    await ZoteroLayoutLab.main();
+    ZoteroLayoutLab.execute();
+
+    var windows = Zotero.getMainWindows();
+    for (let win of windows) {
+      if (win.ZoteroPane) {
+        ZoteroLayoutLab.addToWindow(win);
+      }
+    }
+
+  } catch(err) {
+    log("CRITICAL STARTUP ERROR: " + err.message + "\n" + err.stack);
+  }
 
   Zotero.PreferencePanes.register({
     pluginID: "zotero-layout-lab@ari.takku.fi", // Must match manifest id exactly
     src: "chrome://zotero-layout-lab/content/preferences.xhtml",
-    scripts: ["chrome://zotero-layout-lab/content/preferences.js"],
+    scripts: ["chrome://zotero-layout-lab/content/preferences.js"]    
   });
 }
 
