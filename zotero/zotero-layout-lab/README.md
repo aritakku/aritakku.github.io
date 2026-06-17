@@ -1,4 +1,4 @@
-& "C:\Program Files\Zotero\zotero.exe" -ZoteroDebugText -jsconsole -jsdebugger
+& "C:\Program Files\Zotero\zotero.exe" -purgecaches -ZoteroDebugText -jsconsole -jsdebugger
 
 html body.sidebar-open div#reader-ui div.split-view div.primary-view div.view-popup.selection-popup.page-popup-bottom-center
 

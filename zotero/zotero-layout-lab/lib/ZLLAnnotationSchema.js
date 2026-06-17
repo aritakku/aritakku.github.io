@@ -48,6 +48,3 @@ const ZLLAnnotationSchema = {
     emoji: "🟡",
   },
 };
-
-// Expose directly to the privileged application execution scope
-globalThis.ZLLAnnotationSchema = ZLLAnnotationSchema;

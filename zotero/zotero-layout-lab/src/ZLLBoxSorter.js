@@ -1,16 +1,29 @@
-class ZLLBoxSorter {
-  /* ==============================================================================
-     RIGHT-HAND SIDE PANEL TAG SORTING (FLEXBOX OVERRIDE)
-     ============================================================================== */
-  constructor() {
-    this.sectionId = "zll-box-sorter-section";
-    this.openLayoutObservers = new Map();
-    this._windowListenerId = null;
-    this._ww = null;
-    this.verifiedTagsBoxId = "zotero-editpane-tags";
-    this.verifiedInfoBoxId = "zotero-editpane-info-box";
-  }
+ZLLBoxSorter = {
+  id: null,
+  version: null,
+  rootURI: null,
+  initialized: false,
+  addedElementIDs: [],
 
+  init({ id, version, rootURI }) {
+    if (this.initialized) return;
+    this.id = id;
+    this.version = version;
+    this.rootURI = rootURI;
+    this.initialized = true;
+  },
+
+  log(msg) {
+    Zotero.debug("[ZLL Box Sorter]: " + msg);
+  },
+
+  execute() {
+    this.addToAllWindows();
+  },
+
+  /* ==============================================================================
+    RIGHT-HAND SIDE PANEL TAG SORTING (FLEXBOX OVERRIDE)
+    ============================================================================== */
   applyFlexLayoutHack(win) {
     if (!win || !win.document) return;
     const doc = win.document;
@@ -37,47 +50,52 @@ class ZLLBoxSorter {
     }, 200);
 
     this.openLayoutObservers.set(win, intervalId);
-  }
+  },
 
-  register() {
-    const windows = Zotero.getMainWindows();
+  addToWindow(window) {
+    this.applyFlexLayoutHack(window);
+  },
+
+  addToAllWindows() {
+    var windows = Zotero.getMainWindows();
     for (let win of windows) {
-      if (win.ZoteroPane) {
-        this.applyFlexLayoutHack(win);
-      }
+      if (!win.ZoteroPane) continue;
+      this.addToWindow(win);
     }
+  },
 
-    // Set up cross-window listener callbacks using native Mozilla interfaces
-    this._windowWatcherCallback = (win) => {
-      win.addEventListener(
-        "load",
-        () => {
-          if (win.ZoteroPane) {
-            this.applyFlexLayoutHack(win);
-          }
-        },
-        { once: true },
-      );
-    };
-
-    this._ww = Components.classes[
-      "@mozilla.org/embedcomp/window-watcher;1"
-    ].getService(Components.interfaces.nsIWindowWatcher);
-    this._ww.registerNotification(this._windowWatcherCallback);
-  }
-
-  unregister() {
-    if (this._ww && this._windowWatcherCallback) {
-      this._ww.unregisterNotification(this._windowWatcherCallback);
+  storeAddedElement(elem) {
+    if (!elem.id) {
+      throw new Error("Element must have an id");
     }
+    this.addedElementIDs.push(elem.id);
+  },
 
-    // Clear intervals cleanly to prevent context memory leakage
-    for (let [win, intervalId] of this.openLayoutObservers.entries()) {
-      win.clearInterval(intervalId);
+  removeFromWindow(window) {
+    var doc = window.document;
+    // Remove all elements added to DOM
+    for (let id of this.addedElementIDs) {
+      doc.getElementById(id)?.remove();
     }
-    this.openLayoutObservers.clear();
-  }
-}
+    doc.querySelector('[href="make-it-red.ftl"]').remove();
+  },
 
-// Expose safely to bootstrap runtime context
-globalThis.ZLLBoxSorter = ZLLBoxSorter;
+  removeFromAllWindows() {
+    var windows = Zotero.getMainWindows();
+    for (let win of windows) {
+      if (!win.ZoteroPane) continue;
+      this.removeFromWindow(win);
+    }
+  },
+
+  async main() {
+    // Global properties are included automatically in Zotero 7
+    var host = new URL("https://foo.com/path").host;
+    this.log(`Host is ${host}`);
+
+    // Retrieve a global pref
+    this.log(
+      `Intensity is ${Zotero.Prefs.get("extensions.make-it-red.intensity", true)}`,
+    );
+  },
+};

@@ -1,180 +1,104 @@
-class ZLLAnnotationManager {
-  constructor() {
-    this.sectionId = "zll-annotation-section-id";
-    this._readerListenerIds = []; // <-- array to track active event listeners
-  }
+ZLLAnnotationManager = {
+  id: null,
+  version: null,
+  rootURI: null,
+  initialized: false,
+  addedElementIDs: [],
 
-  register() {
-    // Native Zotero 9 ItemPane registration context
-    Zotero.ItemPaneManager.registerSection({
-      id: this.sectionId,
-      //paneID: "zll-annotation-pane-id",
-      paneID: "annotation",
-      pluginID: "zotero-layout-lab@ari.takku.fi", // Must match manifest id exactly
-      header: {
-        l10nID: "general.optional",
-        icon: "icons/zll-logo-128x.png",
-      },
-      sidenav: {
-        l10nID: "zll-annotation-sidenav", // Must inject the corresponding `ftl` file
-        icon: "icons/zll-logo-128x.png",
-      },
+  init({ id, version, rootURI }) {
+    if (this.initialized) return;
+    this.id = id;
+    this.version = version;
+    this.rootURI = rootURI;
+    this.initialized = true;
+  },
 
-      onInit: ({ paneID, doc, body }) => {
-        Zotero.debug("Section initialized");
-      },
-      onDestroy: ({ paneID, doc, body }) => {
-        // Release resource
-        Zotero.debug("Section destroyed");
-      },
+  log(msg) {
+    Zotero.debug("[ZLL Annotation Manager]: " + msg);
+  },
 
-      // ZLL FIX 1: Visibility/Enabling controller callback matching Z9 schema
-      onItemChange: ({ item, setEnabled }) => {
-        // Only wake this pane if the selected active item is a valid Zotero Annotation
-        setEnabled(item && item.isAnnotation());
-      },
+  execute() {
+    this.addToAllWindows();
+  },
 
-      // ZLL FIX 2: Correct destructuring matching Z9 API signatures
-      onRender: ({ doc, body, item }) => {
-        if (!item || !item.isAnnotation()) return;
+  addToWindow(window) {
+    let doc = window.document;
 
-        // Reset your structural layout container cleanly
-        body.innerHTML = "";
+    // Add a stylesheet to the main Zotero pane
+    let link1 = doc.createElement("link");
+    link1.id = "zll-stylesheet";
+    link1.type = "text/css";
+    link1.rel = "stylesheet";
+    link1.href = this.rootURI + "style.css";
+    doc.documentElement.appendChild(link1);
+    this.storeAddedElement(link1);
 
-        // Intercept web component element layout tree to cleanly draw your pane label title
-        try {
-          const sectionElement = body.closest("collapsible-section");
-          if (sectionElement) {
-            const titleBox = sectionElement.querySelector(".title-box");
-            if (titleBox) {
-              titleBox.textContent = "ZLL Classification";
-            }
-          }
-        } catch (err) {
-          Zotero.debug("[ZLL] Section element wrapper query note: " + err);
-        }
+    // Use Fluent for localization
+    window.MozXULElement.insertFTLIfNeeded("zotero-layout-lab.ftl");
 
-        // Map colors from your global schemas
-        const colorName = item.annotationColor || "yellow";
-        const schema =
-          ZLLAnnotationSchema[colorName] || ZLLAnnotationSchema.yellow;
-
-        const container = doc.createElement("div");
-        container.style.padding = "4px 8px 8px 8px";
-        container.style.fontSize = "12px";
-
-        // Row 1: Logic Type Display Card
-        const logicRow = doc.createElement("div");
-        logicRow.style.fontWeight = "bold";
-        logicRow.style.marginBottom = "4px";
-        logicRow.textContent = `${schema.emoji} Type: ${schema.logic}`;
-        container.appendChild(logicRow);
-
-        // Row 2: Academic Core Descriptive Function
-        const functionRow = doc.createElement("div");
-        functionRow.style.color = "var(--theme-text-secondary, #666)";
-        functionRow.style.marginBottom = "6px";
-        functionRow.textContent = schema.functionText;
-        functionRow.setAttribute(
-          "title",
-          `Framework context for ${schema.logic}`,
-        );
-        container.appendChild(functionRow);
-
-        // Row 3: Target Obsidian Vault Path Mapping Properties
-        const mappingRow = doc.createElement("div");
-        mappingRow.style.background =
-          "var(--theme-background-secondary, #f5f5f5)";
-        mappingRow.style.padding = "4px 6px";
-        mappingRow.style.borderRadius = "3px";
-        mappingRow.style.fontFamily = "monospace";
-        mappingRow.textContent = `Obsidian: [[${schema.obsidian}]]`;
-        container.appendChild(mappingRow);
-
-        body.appendChild(container);
-      },
-
-      onAsyncRender: async ({ body }) => {
-        // Put time-consuming rendering here
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        body
-          .querySelector(".my-plugin-section")
-          ?.style.setProperty("color", "red");
-      },
-      onToggle: ({
-        paneID,
-        doc,
-        body,
-        item,
-        tabType,
-        editable,
-        setEnabled,
-      }) => {
-        // Handle section toggle
-        Zotero.debug("Section toggled");
-      },
-      sectionButtons: [
-        // Section button will appear in the header
-      ],
+    // Add menu option
+    let menuitem = doc.createXULElement("menuitem");
+    menuitem.id = "make-it-green-instead";
+    menuitem.setAttribute("type", "checkbox");
+    menuitem.setAttribute("data-l10n-id", "make-it-red-green-instead");
+    // MozMenuItem#checked is available in Zotero 7
+    menuitem.addEventListener("command", () => {
+      MakeItRed.toggleGreen(window, menuitem.checked);
     });
+    doc.getElementById("menu_viewPopup").appendChild(menuitem);
+    this.storeAddedElement(menuitem);
+  },
 
-    // Event proxy framework execution initialization for mouseover bindings
-    this._setupHoverTooltips();
-  }
-
-  _setupHoverTooltips() {
-    const listenerId = Zotero.Reader.registerEventListener(
-      "readerLoad",
-      (event) => {
-        const reader = event.reader;
-        const readerDoc = reader.window.document;
-
-        readerDoc.addEventListener(
-          "mouseover",
-          (e) => {
-            const annotationEl = e.target.closest(".annotation");
-            if (!annotationEl) return;
-
-            const annotationId =
-              annotationEl.getAttribute("data-annotation-id");
-            if (!annotationId) return;
-
-            const item = Zotero.Items.getByLibraryAndKey(
-              reader.libraryID,
-              annotationId,
-            );
-            if (item && item.isAnnotation()) {
-              const color = item.annotationColor || "yellow";
-              const schema = ZLLAnnotationSchema[color];
-
-              if (schema && !annotationEl.hasAttribute("title")) {
-                annotationEl.setAttribute(
-                  "title",
-                  `[${schema.logic}] — ${schema.functionText}\nMapping: ${schema.obsidian}`,
-                );
-              }
-            }
-          },
-          true,
-        );
-      },
-    );
-
-    this._readerListenerIds.push(listenerId);
-  }
-
-  unregister() {
-    Zotero.ItemPaneManager.unregisterSection(this.sectionId);
-
-    for (let id of this._readerListenerIds) {
-      try {
-        Zotero.Reader.unregisterEventListener(id);
-      } catch (e) {
-        Zotero.debug("[ZLL] Error purging reader listener frames: " + e);
-      }
+  addToAllWindows() {
+    var windows = Zotero.getMainWindows();
+    for (let win of windows) {
+      if (!win.ZoteroPane) continue;
+      this.addToWindow(win);
     }
-    this._readerListenerIds = [];
-  }
-}
+  },
 
-globalThis.ZLLAnnotationManager = ZLLAnnotationManager;
+  storeAddedElement(elem) {
+    if (!elem.id) {
+      throw new Error("Element must have an id");
+    }
+    this.addedElementIDs.push(elem.id);
+  },
+
+  removeFromWindow(window) {
+    var doc = window.document;
+    // Remove all elements added to DOM
+    for (let id of this.addedElementIDs) {
+      doc.getElementById(id)?.remove();
+    }
+    const link = doc.querySelector('[href="zotero-layout-lab.ftl"]');
+    if (link !== null) {
+      link.remove();
+    }
+  },
+
+  removeFromAllWindows() {
+    var windows = Zotero.getMainWindows();
+    for (let win of windows) {
+      if (!win.ZoteroPane) continue;
+      this.removeFromWindow(win);
+    }
+  },
+
+  toggleGreen(window, enabled) {
+    window.document.documentElement.toggleAttribute(
+      "data-green-instead",
+      enabled,
+    );
+  },
+
+  async main() {
+    // Global properties are included automatically in Zotero 7
+    var host = new URL("https://foo.com/path").host;
+    this.log(`Host is ${host}`);
+
+    // Retrieve a global pref
+    this.log(
+      `Intensity is ${Zotero.Prefs.get("extensions.zotero-layout-lab", true)}`,
+    );
+  },
+};

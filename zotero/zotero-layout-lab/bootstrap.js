@@ -1,75 +1,59 @@
-var chromeHandle;
-var annotationManager;
-var boxSorter;
+var ChromeHandle;
+var ZLLAnnotationManager;
+var ZLLBoxSorter;
 
-function install(data, reason) {}
+function log(msg) {
+  Zotero.debug("[ZLL] " + msg);
+}
 
-async function startup({ id, version, resourceURI, rootURI }, reason) {
+function install() {
+  log("Installed 2.0");
+}
+
+async function startup({ id, version, rootURI }) {
+  log("Starting 2.0");
+
+  Zotero.PreferencePanes.register({
+    pluginID: "zotero-layout-lab@ari.takku.fi", // Must match manifest id exactly
+    src: rootURI + "preferences.xhtml",
+    scripts: [rootURI + "preferences.js"],
+  });
+
   // 1. Load the payload schema structure first
-  Services.scriptloader.loadSubScript(`${rootURI}lib/ZLLAnnotationSchema.js`);
+  //Services.scriptloader.loadSubScript(rootURI + "lib/ZLLAnnotationSchema.js");
 
   // 2. Load the structural managers
-  Services.scriptloader.loadSubScript(`${rootURI}src/ZLLAnnotationManager.js`);
-  Services.scriptloader.loadSubScript(`${rootURI}src/ZLLBoxSorter.js`);
+  Services.scriptloader.loadSubScript(rootURI + "src/ZLLAnnotationManager.js");
+  Services.scriptloader.loadSubScript(rootURI + "src/ZLLBoxSorter.js");
 
   // 3. Both classes are now structural globals, initialize safely
-  annotationManager = new ZLLAnnotationManager();
-  annotationManager.register();
 
-  boxSorter = new ZLLBoxSorter();
-  boxSorter.register();
+  ZLLAnnotationManager.init({ id, version, rootURI });
+  ZLLAnnotationManager.execute();
+  await ZLLAnnotationManager.main();
+
+  ZLLBoxSorter.init({ id, version, rootURI });
+  ZLLBoxSorter.execute();
+  await ZLLBoxSorter.main();
 }
 
-async function shutdown({ id, version, resourceURI, rootURI }, reason) {
-  if (reason === APP_SHUTDOWN) {
-    return;
-  }
-
-  if (annotationManager) {
-    annotationManager.unregister();
-    annotationManager = null;
-  }
-
-  if (boxSorter) {
-    boxSorter.unregister();
-    boxSorter = null;
-  }
+function onMainWindowLoad({ window }) {
+  ZLLAnnotationManager.addToWindow(window);
+  ZLLBoxSorter.addToWindow(window);
 }
 
-async function uninstall(data, reason) {}
-
-/*
-import { ZLLAnnotationManager } from "./src/ZLLAnnotationManager.js";
-import { ZLLBoxSorter } from "./src/ZLLBoxSorter.js";
-
-let annotationManager;
-let boxSorter;
-
-export function startup() {
-  // Executed when Zotero 9 fully wakes your plugin instance
-  annotationManager = new ZLLAnnotationManager();
-  annotationManager.register();
-
-  boxSorter = new ZLLBoxSorter();
-  boxSorter.register();
+function onMainWindowUnload({ window }) {
+  ZLLAnnotationManager.removeFromWindow(window);
+  ZLLBoxSorter.removeFromWindow(window);
 }
 
-export function shutdown() {
-  // Cleanly remove components to avoid memory leaks or dangling layout structures on disable
-  if (annotationManager) {
-    annotationManager.unregister();
-  }
-
-  if (boxSorter) {
-    boxSorter.unregister();
-  }
+function shutdown() {
+  log("Shutting down 2.0");
+  ZLLAnnotationManager.removeFromAllWindows();
+  ZLLAnnotationManager = undefined;
+  ZLLBoxSorter = undefined;
 }
 
-export function install() {
-  // Executed on initial plugin installation
+function uninstall() {
+  log("Uninstalled 2.0");
 }
-
-export function uninstall() {
-  // Executed when removing the plugin entirely
-}
-*/
