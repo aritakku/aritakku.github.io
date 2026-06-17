@@ -1,3 +1,11 @@
 *.zip
 *.xpi
 output.txt
+zotero/zotero-settings-sync-codebase.txt
+zotero/zll-codebase.txt
+zotero/file_000000009b347246913e81c768659960.png
+zotero/file_00000000abbc71f4803e01d488292299.png
+zotero/PSX_20260614_082220.png
+zotero/annotation-colors.html
+zotero/zotero-layout-lab/chrome/content/analyzer_worker_bin.js
+zotero/zotero-layout-lab/chrome.manifest_NOT_NEEDED
