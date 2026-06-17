@@ -54,43 +54,39 @@ this.ZLLBoxSorterObj = {
     ];
 
     const tryApplyDynamicSort = () => {
-      let elementsFoundCount = 0;
+      let appliedAny = false;
 
-      // 1. Check how many targeted structural containers exist in the current DOM state
       layoutElements.forEach(item => {
-        if (doc.getElementById(item.id)) {
-          elementsFoundCount++;
+        const domNode = doc.getElementById(item.id);
+        if (domNode) {
+          const preferenceKey = `extensions.zotero.zotero-layout-lab.order.${item.pref}`;
+          const targetOrderValue = Zotero.Prefs.get(preferenceKey, true);
+          
+          // Apply order immediately onto whatever layout blocks are currently visible
+          domNode.style.order = String(targetOrderValue);
+          appliedAny = true;
+
+          this.log(`DEBUG: item.id: ${item.id}, preferenceKey: ${preferenceKey}, targetOrderValue: ${targetOrderValue}`)
         }
       });
 
-      // 2. Only perform operations once the React engine completes rendering the target node blocks
-      if (elementsFoundCount > 0) {
-        layoutElements.forEach(item => {
-          const domNode = doc.getElementById(item.id);
-          if (domNode) {
-            // Retrieve user selection value from disk preference strings safely
-            const preferenceKey = `extensions.zotero.zotero-layout-lab.order.${item.pref}`;
-            const targetOrderValue = Zotero.Prefs.get(preferenceKey, true);
-            
-            // Inject the priority order style string modification directly
-            domNode.style.order = String(targetOrderValue);
-          }
-        });
-        return true;
-      }
-      return false;
+      return appliedAny;
     };
 
-    // Run lookups immediately if frame context is already live
-    if (tryApplyDynamicSort()) return;
+    // Run lookups immediately
+    if (tryApplyDynamicSort()) {
+      // Don't stop entirely on first match, because switching items in Zotero re-renders the DOM dynamically!
+    }
 
-    // If React rendering latency delays box loading, loop recursively until elements mount
+    // Clear old existing interval slots to prevent thread accumulation
+    if (this.openLayoutObservers.has(win)) {
+      win.clearInterval(this.openLayoutObservers.get(win));
+    }
+
+    // Keep checking periodically to catch dynamic pane changes when a user changes selected items
     const intervalId = win.setInterval(() => {
-      if (tryApplyDynamicSort()) {
-        win.clearInterval(intervalId);
-        this.openLayoutObservers.delete(win);
-      }
-    }, 250);
+      tryApplyDynamicSort();
+    }, 300);
 
     this.openLayoutObservers.set(win, intervalId);
   },
