@@ -6,12 +6,21 @@ function log(msg) {
   Zotero.debug("[ZLL] " + msg);
 }
 
-function install() {
+function install(data, reason) {
   log("Installed 2.0");
 }
 
-async function startup({ id, version, rootURI }) {
+async function startup({ id, version, rootURI }, reason) {
   log("Starting 2.0");
+
+  var aomStartup = Components.classes[
+    "@mozilla.org/addons/addon-manager-startup;1"
+  ].getService(Components.interfaces.amIAddonManagerStartup);
+
+  var manifestURI = Services.io.newURI(rootURI + "manifest.json");
+  ChromeHandle = aomStartup.registerChrome(manifestURI, [
+    ["content", "zotero-layout-lab", rootURI + "chrome/content/"],
+  ]);
 
   Zotero.PreferencePanes.register({
     pluginID: "zotero-layout-lab@ari.takku.fi", // Must match manifest id exactly
