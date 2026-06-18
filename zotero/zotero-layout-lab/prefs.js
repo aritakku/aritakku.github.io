@@ -41,6 +41,8 @@ pref("extensions.zotero.zotero-layout-lab.schema.yellow.obsidian", "literature-n
 pref("extensions.zotero.zotero-layout-lab.schema.yellow.emoji", "yellow_circle");
 
 
+pref("extensions.zotero.zotero-layout-lab.item-pane.js-query-selector", "item-pane#zotero-item-pane > deck#zotero-item-pane-content div#zotero-view-item");
+pref("extensions.zotero.zotero-layout-lab.item-pane.core-sections", "info-box, abstract, attachments, notes, attachment-annotations, libraries-collections, tags, related");
 
 // Layout DOM Element IDs
 pref("extensions.zotero.zotero-layout-lab.id.info-box", "zotero-editpane-info-box");

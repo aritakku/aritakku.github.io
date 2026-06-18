@@ -6,41 +6,52 @@
 
   <html:h2>Zotero Layout Lab Settings</html:h2>
 
+  <groupbox style="margin-top: 15px; padding: 10px;">
+    <label><html:h2>Side Pane Section Order</html:h2></label>
+    <description style="margin-bottom: 15px; color: #666;">
+      Assign sequential numbers to arrange the panels. Lower numbers float to the top.
+      All other panels are kept in bottom. You can use any numbers here: they are sorted against each other.
+    </description>
 
-    <groupbox style="margin-top: 15px; padding: 10px;">
-      <label><html:h2>Side Pane Section Order</html:h2></label>
-      <description style="margin-bottom: 10px; color: #666;">
-        Assign sequential numbers to arrange the panels. Lower numbers float to the top.
-      </description>
+    <html:div style="display: grid; grid-template-columns: 200px 80px 220px; gap: 10px 15px; align-items: center;">
+      
+      <html:b>Panel Name</html:b>
+      <html:b>Sequence</html:b>
+      <html:b>Target DOM ID Name</html:b>
 
-      <html:div style="display: grid; grid-template-columns: 220px 80px; gap: 8px; align-items: center;">
-        <label value="Info Box Layout Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.info-box" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Info Box Panel:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.info-box" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.info-box" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Abstract Panel Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.abstract" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Abstract Panel:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.abstract" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.abstract" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Attachments Box Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachments" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Attachments Box:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachments" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.attachments" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Item Notes Box Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.notes" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Item Notes Box:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.notes" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.notes" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Attachment Annotations Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachment-annotations" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Attachment Annotations:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.attachment-annotations" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.attachment-annotations" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Libraries &amp; Collections Box:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.libraries-collections" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Libraries &amp; Collections:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.libraries-collections" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.libraries-collections" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Tags Element DOM ID Name:" />
-        <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.tags" style="padding:4px; border:1px solid #ccc; width:200px;" />
+      <label value="Tags Element Box:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.tags" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.tags" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Tags Layout Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.tags" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <label value="Related Items Box:" />
+      <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.related" style="padding:4px; border:1px solid #ccc; width:60px;" />
+      <html:input type="text" preference="extensions.zotero.zotero-layout-lab.id.related" style="padding:4px; border:1px solid #ccc; width:200px;" />
 
-        <label value="Related Items Box Sequence:" />
-        <html:input type="number" preference="extensions.zotero.zotero-layout-lab.order.related" style="padding:4px; border:1px solid #ccc; width:60px;" />
-      </html:div>
+    </html:div>
   </groupbox>
 
 </vbox>
