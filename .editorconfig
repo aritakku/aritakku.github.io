@@ -1,0 +1,7 @@
+# Website and Zotero extension source
+# Proposal only: the active filename is .editorconfig.
+# Set line endings only; leave encoding, indentation and whitespace unchanged.
+root = true
+
+[*]
+end_of_line = lf

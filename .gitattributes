@@ -1,1 +1,7 @@
+# Website and Zotero extension source
+# Detect text automatically; normalize and check out text with LF.
 * text=auto eol=lf
+
+# Binary artwork currently tracked here.
+*.png binary
+*.psd binary
